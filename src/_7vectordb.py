@@ -35,16 +35,12 @@ def upsert_embeddings_to_qdrant(embeddings, chunks):
     Upserts embeddings and their corresponding metadata into the Qdrant collection.
     """
     client, collection_name = initialize_qdrant_collection()
-    metadata = [{"text": chunk} for chunk in chunks]
-    if isinstance(metadata, dict):
-        metadata = metadata.values()
 
     # 3. Save your embeddings as "Points"
     points = [
         PointStruct(id=idx, vector=vector, payload=meta)
-        for idx, (vector, meta) in enumerate(zip(embeddings, metadata))
+        for idx, (vector, meta) in enumerate(zip(embeddings, chunks))
     ]
-
     client.upsert(collection_name=collection_name, points=points)
 
 if __name__ == "__main__":

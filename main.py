@@ -12,13 +12,21 @@ def main():
     raw_text = parse_pdf(pdf_path)
     print("parse pdf done")
     cleaned_text = clean_text(raw_text)
-    chunks = chunk_text(
+    chunk_texts = chunk_text(
         cleaned_text,
         chunk_size = CHUNK_SIZE,
         chunk_overlap = CHUNK_OVERLAP
     )
+    chunks = [
+        {
+            "text": chunk,
+            "source": pdf_path.name,
+            "chunk_id": i
+        }
+        for i, chunk in enumerate(chunk_texts)
+    ]
     print(f"Total chunks created: {len(chunks)}")
-    embeddings = embed_chunks(chunks)
+    embeddings = embed_chunks(chunk_texts)
     print("Embeddings generated for all chunks.")
     upsert_embeddings_to_qdrant(embeddings, chunks)
     query = "Who authored document titled 100G Networking technology overview"
