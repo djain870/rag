@@ -3,7 +3,7 @@ from src._2parser import parse_pdf, clean_text, get_first_pdf
 from src._3chunker import chunk_text
 from src._4embedding import embed_chunks, embed_query
 from src._5retriever import search_enterprise_knowledge
-from src._6generator import call_llm, build_prompt
+from src._6generator import call_llm, build_prompt, build_context
 from src._7vectordb import upsert_embeddings_to_qdrant
 
 
@@ -32,7 +32,7 @@ def main():
     query = "Who authored document titled 100G Networking technology overview"
     print(f"Query: {query}")
     query_embedding = embed_query(query)
-    context = search_enterprise_knowledge(query_embedding)
+    context = build_context(query_embedding)
     prompt = build_prompt(query, context)
     response = call_llm(prompt)
     print(f"Response: {response}")
