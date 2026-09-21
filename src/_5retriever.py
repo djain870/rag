@@ -1,10 +1,10 @@
 # from sklearn.metrics.pairwise import cosine_similarity
 from ._1config import QDRANT_COLLECTION, TOP_K
 from qdrant_client import QdrantClient
-
+from qdrant_client.models import Filter, FieldCondition, MatchValue
 import os
 
-def search_enterprise_knowledge(query_vector: str):
+def search_enterprise_knowledge(query_vector: str, source = None):
 
     # Using query_points - the modern standard for Qdrant
     client = QdrantClient(url = os.getenv("QDRANT_CLUSTER_ENDPOINT"),api_key = os.getenv("QDRANT_API_KEY"))
@@ -12,10 +12,22 @@ def search_enterprise_knowledge(query_vector: str):
         url = os.getenv("QDRANT_CLUSTER_ENDPOINT"),
         api_key = os.getenv("QDRANT_API_KEY"),
     )
+
+    query_filter = None
+    if source:
+        query_filter = Filter(
+            must=[
+                FieldCondition(
+                    key="source",
+                    match=MatchValue(value=source),
+                )
+            ]
+        )
     
     response = client.query_points(
         collection_name=QDRANT_COLLECTION,
         query=query_vector,
+        query_filter= query_filter,
         limit = TOP_K,
         with_payload=True,  # JSON
     )
@@ -30,7 +42,7 @@ def search_enterprise_knowledge(query_vector: str):
             "score": res.score,
             }
         )
-    print(results)
+    # print(results)
     return results
 
 

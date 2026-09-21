@@ -38,10 +38,15 @@ def main():
     print(f"Total chunks created: {len(all_chunks)}")
     embeddings = embed_chunks([chunk["text"] for chunk in all_chunks])
     print("Embeddings generated for all chunks.")
-    upsert_embeddings_to_qdrant(embeddings, all_chunks)
+    # upsert_embeddings_to_qdrant(embeddings, all_chunks)
     query = "Who authored document titled 100G Networking technology overview"
     print(f"Query: {query}")
     query_embedding = embed_query(query)
+    results = search_enterprise_knowledge(
+        query_vector = query_embedding,
+        source = pdf_path.name
+    )
+    print(results)
     context = build_context(query_embedding)
     prompt = build_prompt(query, context)
     response = call_llm(prompt)
