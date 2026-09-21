@@ -2,5 +2,6 @@ __pycache__/
 *.pyc
 .env
 myenv/
-src/learn_python.ipynb
+learn_python.ipynb
 DATA/
+qdrant_storage/
