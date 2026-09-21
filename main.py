@@ -1,9 +1,10 @@
-from src.config import DATA_DIR, CHUNK_SIZE, CHUNK_OVERLAP
-from src.parser import parse_pdf, clean_text, get_first_pdf
-from src.chunker import chunk_text
-from src.embedding import embed_chunks, embed_query
-from src.retriever import top3_chunks_combined_context
-from src.generator import call_llm, build_prompt
+from src._1config import DATA_DIR, CHUNK_SIZE, CHUNK_OVERLAP
+from src._2parser import parse_pdf, clean_text, get_first_pdf
+from src._3chunker import chunk_text
+from src._4embedding import embed_chunks, embed_query
+from src._5retriever import top3_chunks_combined_context, search_enterprise_knowledge
+from src._6generator import call_llm, build_prompt
+from src._7vectordb import upsert_embeddings_to_qdrant
 
 
 def main():
@@ -19,10 +20,11 @@ def main():
     print(f"Total chunks created: {len(chunks)}")
     embeddings = embed_chunks(chunks)
     print("Embeddings generated for all chunks.")
+    upsert_embeddings_to_qdrant(embeddings, chunks)
     query = "Who authored document titled 100G Networking technology overview"
     print(f"Query: {query}")
     query_embedding = embed_query(query)
-    context = top3_chunks_combined_context(query_embedding, chunks, embeddings)
+    context = search_enterprise_knowledge(query_embedding)
     prompt = build_prompt(query, context)
     response = call_llm(prompt)
     print(f"Response: {response}")
