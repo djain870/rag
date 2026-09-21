@@ -4,7 +4,7 @@ from src._3chunker import chunk_text
 from src._4embedding import embed_chunks, embed_query
 from src._5retriever import search_enterprise_knowledge
 from src._6generator import call_llm, build_prompt, build_context
-from src._7vectordb import upsert_embeddings_to_qdrant
+from src._7vectordb import upsert_embeddings_to_qdrant, check_document_exists
 
 
 def prepare_chunks(cleaned_pages, pdf_path):
@@ -32,6 +32,9 @@ def prepare_chunks(cleaned_pages, pdf_path):
 def main():
     pdf_paths = get_all_pdfs(DATA_DIR)
     for pdf_path in pdf_paths:
+        if check_document_exists(pdf_path.name):
+            print(f"Skipping {pdf_path.name}")
+            continue
         raw_pages = parse_pdf(pdf_path)
         cleaned_pages = clean_text(raw_pages)
         all_chunks = prepare_chunks(cleaned_pages, pdf_path)

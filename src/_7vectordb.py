@@ -1,5 +1,6 @@
 from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams, PointStruct
+from qdrant_client.models import Filter, FieldCondition, MatchValue
 from ._1config import QDRANT_COLLECTION
 import uuid
 
@@ -7,6 +8,33 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
+
+def check_document_exists(source: str) -> bool:
+    client = QdrantClient(
+        url = os.getenv("QDRANT_CLUSTER_ENDPOINT"),
+        api_key = os.getenv("QDRANT_API_KEY"),
+    )
+    query_filter = None
+    if source:
+        query_filter = Filter(
+            must=[
+                FieldCondition(
+                    key="source",
+                    match=MatchValue(value=source),
+                )
+            ]
+        )
+    response = client.scroll(
+        collection_name=QDRANT_COLLECTION,
+        scroll_filter=query_filter,
+        limit=1,
+        with_payload=False,
+        with_vectors=False,
+    )
+
+    return len(response[0]) > 0
+
+
 
 def initialize_qdrant_collection():
     """
