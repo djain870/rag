@@ -1,6 +1,7 @@
 from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams, PointStruct
 from ._1config import QDRANT_COLLECTION
+import uuid
 
 import os
 from dotenv import load_dotenv
@@ -44,8 +45,8 @@ def upsert_embeddings_to_qdrant(embeddings, chunks):
 
     # 3. Save your embeddings as "Points"
     points = [
-        PointStruct(id=idx, vector=vector, payload=meta)
-        for idx, (vector, meta) in enumerate(zip(embeddings, chunks))
+        PointStruct(id=str(uuid.uuid4()), vector=vector, payload=meta)
+        for vector, meta in zip(embeddings, chunks)
     ]
     client.upsert(collection_name=collection_name, points=points)
 

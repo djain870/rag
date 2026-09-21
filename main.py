@@ -1,5 +1,5 @@
 from src._1config import DATA_DIR, CHUNK_SIZE, CHUNK_OVERLAP
-from src._2parser import parse_pdf, clean_text, get_first_pdf
+from src._2parser import parse_pdf, clean_text, get_first_pdf, get_all_pdfs
 from src._3chunker import chunk_text
 from src._4embedding import embed_chunks, embed_query
 from src._5retriever import search_enterprise_knowledge
@@ -30,21 +30,20 @@ def prepare_chunks(cleaned_pages, pdf_path):
 
 
 def main():
-    pdf_path = get_first_pdf(DATA_DIR)
-    raw_pages = parse_pdf(pdf_path)
-    print("parse pdf done")
-    cleaned_pages = clean_text(raw_pages)
-    all_chunks = prepare_chunks(cleaned_pages, pdf_path)
-    print(f"Total chunks created: {len(all_chunks)}")
-    embeddings = embed_chunks([chunk["text"] for chunk in all_chunks])
-    print("Embeddings generated for all chunks.")
-    # upsert_embeddings_to_qdrant(embeddings, all_chunks)
+    pdf_paths = get_all_pdfs(DATA_DIR)
+    for pdf_path in pdf_paths:
+        raw_pages = parse_pdf(pdf_path)
+        cleaned_pages = clean_text(raw_pages)
+        all_chunks = prepare_chunks(cleaned_pages, pdf_path)
+        print(f"Total chunks created: {len(all_chunks)}")
+        embeddings = embed_chunks([c["text"] for c in all_chunks])
+        print("Embeddings generated for all chunks.")
+        upsert_embeddings_to_qdrant(embeddings, all_chunks)
     query = "Who authored document titled 100G Networking technology overview"
     print(f"Query: {query}")
     query_embedding = embed_query(query)
     results = search_enterprise_knowledge(
-        query_vector = query_embedding,
-        source = pdf_path.name
+        query_vector = query_embedding
     )
     print(results)
     context = build_context(query_embedding)

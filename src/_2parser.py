@@ -13,6 +13,14 @@ def get_first_pdf(data_dir: Path) -> Path:
     print(pdf_paths[0])
     return pdf_paths[0]
 
+def get_all_pdfs(data_dir: Path) -> list[Path]:
+    pdf_paths = sorted(data_dir.glob("*.pdf"))
+
+    if not pdf_paths:
+        raise FileNotFoundError(f"No PDF files found in {data_dir}")
+
+    return pdf_paths
+
 
 def parse_pdf(pdf_path: Path) -> list[dict]:
     """Extract text from every page in a PDF."""
