@@ -22,9 +22,15 @@ def search_enterprise_knowledge(query_vector: str):
 
     results = []
     for res in response.points:
-        results.append(
-            {"content": res.payload.get("text", ""), "score": res.score}
+        results.append({
+            "text": res.payload.get("text", ""),
+            "source": res.payload.get("source", ""),
+            "page": res.payload.get("page", ""),
+            "chunk_id": res.payload.get("chunk_id", ""),
+            "score": res.score,
+            }
         )
+    print(results)
     return results
 
 
