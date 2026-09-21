@@ -2,7 +2,7 @@ from src._1config import DATA_DIR, CHUNK_SIZE, CHUNK_OVERLAP
 from src._2parser import parse_pdf, clean_text, get_first_pdf
 from src._3chunker import chunk_text
 from src._4embedding import embed_chunks, embed_query
-from src._5retriever import top3_chunks_combined_context, search_enterprise_knowledge
+from src._5retriever import search_enterprise_knowledge
 from src._6generator import call_llm, build_prompt
 from src._7vectordb import upsert_embeddings_to_qdrant
 
