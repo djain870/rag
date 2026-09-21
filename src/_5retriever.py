@@ -7,7 +7,6 @@ import os
 def search_enterprise_knowledge(query_vector: str, source = None):
 
     # Using query_points - the modern standard for Qdrant
-    client = QdrantClient(url = os.getenv("QDRANT_CLUSTER_ENDPOINT"),api_key = os.getenv("QDRANT_API_KEY"))
     client = QdrantClient(
         url = os.getenv("QDRANT_CLUSTER_ENDPOINT"),
         api_key = os.getenv("QDRANT_API_KEY"),
