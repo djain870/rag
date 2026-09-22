@@ -3,7 +3,15 @@ from pypdf import PdfReader
 import re
 
 from ._1config import DATA_DIR
+import hashlib
 
+def get_document_hash(pdf_path: Path) -> str:
+    """Return a hash of the PDF contents."""
+    sha256 = hashlib.sha256()
+    with open(pdf_path, "rb") as f:
+        while chunk := f.read(8192):
+            sha256.update(chunk)
+    return sha256.hexdigest()
 
 def get_first_pdf(data_dir: Path) -> Path:
     """Return the first PDF in the folder, sorted by filename."""
