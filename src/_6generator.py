@@ -11,6 +11,7 @@ def build_context(query_embedding):
     # to find relevant information based on the query.
     # For demonstration purposes, we'll return a placeholder context.
     results = search_enterprise_knowledge(query_embedding)
+    print(results)
     context = "  ".join([results[i]['text'] for i in range(len(results))])
     return context
 

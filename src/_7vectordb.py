@@ -1,6 +1,6 @@
 from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams, PointStruct
-from qdrant_client.models import Filter, FieldCondition, MatchValue
+from qdrant_client.models import Filter, FieldCondition, MatchValue, FilterSelector
 from ._1config import QDRANT_COLLECTION
 import uuid
 
@@ -8,6 +8,60 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
+
+def retrieve_document_hash(source: str) -> str:
+    client = QdrantClient(
+        url = os.getenv("QDRANT_CLUSTER_ENDPOINT"),
+        api_key = os.getenv("QDRANT_API_KEY"),
+    )
+    query_filter = None
+    if source:
+        query_filter = Filter(
+            must=[
+                FieldCondition(
+                    key="source",
+                    match=MatchValue(value=source),
+                )
+            ]
+        )
+    response = client.scroll(
+        collection_name=QDRANT_COLLECTION,
+        scroll_filter=query_filter,
+        limit=1,
+        with_payload=True,
+        with_vectors=False,
+    )
+
+    if len(response[0]) == 0:
+        return None
+
+    return response[0][0].payload.get("doc_hash")
+
+def delete_document(source: str) -> str:
+    client = QdrantClient(
+        url = os.getenv("QDRANT_CLUSTER_ENDPOINT"),
+        api_key = os.getenv("QDRANT_API_KEY"),
+    )
+    query_filter = None
+    if source:
+        query_filter = Filter(
+            must=[
+                FieldCondition(
+                    key="source",
+                    match=MatchValue(value=source),
+                )
+            ]
+        )
+    response = client.delete(
+        collection_name=QDRANT_COLLECTION,
+        points_selector=FilterSelector(
+            filter=query_filter,
+        ),
+    )
+    print(response)
+    print(response.status)
+    print(type(response.status))
+    return response.status
 
 def check_document_exists(source: str) -> bool:
     client = QdrantClient(
