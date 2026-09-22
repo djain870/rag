@@ -1,5 +1,5 @@
 # from sklearn.metrics.pairwise import cosine_similarity
-from ._1config import QDRANT_COLLECTION, TOP_K
+from ._1config import QDRANT_COLLECTION, TOP_K, SCORE_THRESHOLD
 from qdrant_client import QdrantClient
 from qdrant_client.models import Filter, FieldCondition, MatchValue
 import os
@@ -32,7 +32,10 @@ def search_enterprise_knowledge(query_vector: str, source = None):
     )
 
     results = []
+    print(f"Total results: {len(response.points)}")
     for res in response.points:
+        if res.score < SCORE_THRESHOLD:
+            continue
         results.append({
             "text": res.payload.get("text", ""),
             "source": res.payload.get("source", ""),
@@ -41,7 +44,7 @@ def search_enterprise_knowledge(query_vector: str, source = None):
             "score": res.score,
             }
         )
-    # print(results)
+    print(f"Filtered results: {len(results)}")
     return results
 
 

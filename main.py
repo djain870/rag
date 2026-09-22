@@ -38,9 +38,9 @@ def ingest_document(pdf_path, doc_hash):
 
 def get_query_response(query):
     query_embedding = embed_query(query)
-    results = search_enterprise_knowledge(
-        query_vector = query_embedding
-    )
+    # results = search_enterprise_knowledge(
+    #     query_vector = query_embedding
+    # )
     context = build_context(query_embedding)
     prompt = build_prompt(query, context)
     response = call_llm(prompt)
