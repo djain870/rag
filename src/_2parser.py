@@ -3,6 +3,7 @@ from pypdf import PdfReader
 import re
 
 from ._1config import DATA_DIR
+from ._9logger import logger
 import hashlib
 
 def get_document_hash(pdf_path: Path) -> str:
@@ -18,13 +19,14 @@ def get_first_pdf(data_dir: Path) -> Path:
     pdf_paths = sorted(data_dir.glob("*.pdf"))
     if not pdf_paths:
         raise FileNotFoundError(f"No PDF files found in {data_dir}")
-    print(pdf_paths[0])
+    logger.info("First PDF found: %s", pdf_paths[0])
     return pdf_paths[0]
 
 def get_all_pdfs(data_dir: Path) -> list[Path]:
     pdf_paths = sorted(data_dir.glob("*.pdf"))
 
     if not pdf_paths:
+        logger.exception("No PDF files found in %s", data_dir)
         raise FileNotFoundError(f"No PDF files found in {data_dir}")
 
     return pdf_paths

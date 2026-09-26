@@ -1,6 +1,7 @@
 from openai import OpenAI
 from dotenv import load_dotenv
 from ._5retriever import search_enterprise_knowledge
+from ._9logger import logger
 
 load_dotenv()
 client = OpenAI()
@@ -18,7 +19,8 @@ def build_prompt(query: str, reranked_docs: list[dict]) -> str:
     """Build the prompt sent to the LLM."""
 
     context = "  ".join([reranked_doc['document'] for reranked_doc in reranked_docs])
-    print(context)
+    logger.info("Context: %s", context)
+    # print(context)
 
     return f"""
 You are a helpful assistant.

@@ -2,6 +2,7 @@ from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams, PointStruct
 from qdrant_client.models import Filter, FieldCondition, MatchValue, FilterSelector
 from ._1config import QDRANT_COLLECTION
+from ._9logger import logger
 import uuid
 
 import os
@@ -106,7 +107,8 @@ def initialize_qdrant_collection():
         print("Collection already exists. Skipping creation.")
         return client, QDRANT_COLLECTION
     else:
-        print("Creating new collection for embeddings.")
+        logger.info("Creating new collection for embeddings.")
+        # print("Creating new collection for embeddings.")
         collection_name = QDRANT_COLLECTION
         client.create_collection(
             collection_name=collection_name,
