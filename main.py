@@ -8,6 +8,8 @@ from src._7vectordb import upsert_embeddings_to_qdrant, check_document_exists, r
 from src._8reranker import rerank_documents
 from src._9logger import logger
 
+from langsmith import traceable
+
 
 def prepare_chunks(cleaned_pages, pdf_path, doc_hash):
     all_chunks = []
@@ -29,6 +31,19 @@ def prepare_chunks(cleaned_pages, pdf_path, doc_hash):
             chunk_id +=1
     return all_chunks
 
+@traceable(name="Get Query Response")
+def get_query_response(query):
+    query_embedding = embed_query(query)
+    logger.info("Query embedding generated")
+    results = build_context(query_embedding)
+    logger.info("Results retrieved from db: %s", results)
+    documents = [doc["text"] for doc in results]
+    reranked_docs = rerank_documents(query, documents, top_k=3)
+    prompt = build_prompt(query, reranked_docs)
+    response = call_llm(prompt)
+    return response
+
+@traceable(name="Ingest Document")
 def ingest_document(pdf_path, doc_hash):
     raw_pages = parse_pdf(pdf_path)
     cleaned_pages = clean_text(raw_pages)
@@ -38,22 +53,8 @@ def ingest_document(pdf_path, doc_hash):
     # print("Embeddings generated for all chunks.")
     upsert_embeddings_to_qdrant(embeddings, all_chunks)
 
-def get_query_response(query):
-    query_embedding = embed_query(query)
-    logger.info("Query embedding generated")
-    # results = search_enterprise_knowledge(
-    #     query_vector = query_embedding
-    # )
-    results = build_context(query_embedding)
-    logger.info("Results retrieved from db: %s", results)
-    documents = [doc["text"] for doc in results]
-    reranked_docs = rerank_documents(query, documents, top_k=3)
-    prompt = build_prompt(query, reranked_docs)
-    response = call_llm(prompt)
-    return response
-
-
-def main():
+@traceable(name="Process Documents")
+def process_documents():
     pdf_paths = get_all_pdfs(DATA_DIR)
     #ingest only those documents which are not present or have changed in vectordb
     for pdf_path in pdf_paths:
@@ -69,12 +70,15 @@ def main():
         else:
             logger.info("Document %s has changed. Updating...", pdf_path.name)
             delete_document(pdf_path.name)
-            ingest_document(pdf_path, doc_hash)
+            ingest_document(pdf_path, doc_hash)    
 
-    query = "Who authored document titled 100G Networking technology overview"
+@traceable(name="RAG Pipeline")
+def main(query):
+    process_documents()
     response = get_query_response(query)
     logger.info("Response: %s", response)
+    return response
 
 if __name__ == "__main__":
-    main()
+    main("Who authored document titled 100G Networking technology overview")
 

@@ -1,10 +1,11 @@
 from pathlib import Path
 from pypdf import PdfReader
 import re
+import hashlib
+from langsmith import traceable
 
 from ._1config import DATA_DIR
 from ._9logger import logger
-import hashlib
 
 def get_document_hash(pdf_path: Path) -> str:
     """Return a hash of the PDF contents."""
@@ -31,7 +32,7 @@ def get_all_pdfs(data_dir: Path) -> list[Path]:
 
     return pdf_paths
 
-
+@traceable
 def parse_pdf(pdf_path: Path) -> list[dict]:
     """Extract text from every page in a PDF."""
     reader = PdfReader(pdf_path)

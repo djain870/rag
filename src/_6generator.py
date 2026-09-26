@@ -1,5 +1,7 @@
 from openai import OpenAI
 from dotenv import load_dotenv
+from langsmith import traceable
+
 from ._5retriever import search_enterprise_knowledge
 from ._9logger import logger
 
@@ -35,6 +37,7 @@ Question:
 {query}
 """
 
+@traceable(name="LLM Call")
 def call_llm(prompt: str) -> str:
     """Send a prompt to the LLM."""
 

@@ -1,10 +1,15 @@
 # from sklearn.metrics.pairwise import cosine_similarity
 from ._1config import QDRANT_COLLECTION, TOP_K, SCORE_THRESHOLD
+from ._9logger import logger
+
+from langsmith import traceable
 from qdrant_client import QdrantClient
 from qdrant_client.models import Filter, FieldCondition, MatchValue
 import os
-from ._9logger import logger
 
+
+
+@traceable(name="Vector Search")
 def search_enterprise_knowledge(query_vector: str, source = None):
 
     # Using query_points - the modern standard for Qdrant

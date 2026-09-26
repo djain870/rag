@@ -1,11 +1,14 @@
 import sentence_transformers
 import numpy as np
+from langsmith import traceable
+
 from src._1config import TOP_K_RERANK
 from src._9logger import logger
 
 # 1. Initialize the Cross-Encoder model
 cross_encoder_model = sentence_transformers.CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
 
+@traceable(name="Cross Encoder Reranker")
 def rerank_documents(query: str, documents: list[str], top_k: int = 3):
     """
     Reranks documents based on their semantic relevance to a query 
