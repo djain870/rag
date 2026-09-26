@@ -5,20 +5,20 @@ from ._5retriever import search_enterprise_knowledge
 load_dotenv()
 client = OpenAI()
 
-def build_context(query_embedding):
+def build_context(query_embedding: list[float]) -> str:
     """Build the context for the LLM based on the query."""
     # This function would typically search your vector database or knowledge base
     # to find relevant information based on the query.
     # For demonstration purposes, we'll return a placeholder context.
     results = search_enterprise_knowledge(query_embedding)
-    print(results)
-    context = "  ".join([results[i]['text'] for i in range(len(results))])
-    return context
+    # context = "  ".join([results[i]['text'] for i in range(len(results))])
+    return results
 
-def build_prompt(query: str, context: list[str]) -> str:
+def build_prompt(query: str, reranked_docs: list[dict]) -> str:
     """Build the prompt sent to the LLM."""
 
-    # context_text = "\n\n".join(context)
+    context = "  ".join([reranked_doc['document'] for reranked_doc in reranked_docs])
+    print(context)
 
     return f"""
 You are a helpful assistant.
@@ -48,3 +48,6 @@ def call_llm(prompt: str) -> str:
     )
 
     return response.choices[0].message.content
+
+if __name__ == "__main__":
+    print('hello')

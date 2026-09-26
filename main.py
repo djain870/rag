@@ -5,6 +5,7 @@ from src._4embedding import embed_chunks, embed_query
 from src._5retriever import search_enterprise_knowledge
 from src._6generator import call_llm, build_prompt, build_context
 from src._7vectordb import upsert_embeddings_to_qdrant, check_document_exists, retrieve_document_hash, delete_document
+from src._8reranker import rerank_documents
 
 
 def prepare_chunks(cleaned_pages, pdf_path, doc_hash):
@@ -41,8 +42,11 @@ def get_query_response(query):
     # results = search_enterprise_knowledge(
     #     query_vector = query_embedding
     # )
-    context = build_context(query_embedding)
-    prompt = build_prompt(query, context)
+    results = build_context(query_embedding)
+    documents = [doc["text"] for doc in results]
+    print(results)
+    reranked_docs = rerank_documents(query, documents, top_k=3)
+    prompt = build_prompt(query, reranked_docs)
     response = call_llm(prompt)
     return response
 
@@ -57,7 +61,7 @@ def main():
         if stored_hash is None:
             ingest_document(pdf_path, doc_hash)
         elif stored_hash == doc_hash:
-            print(f"Skipping {pdf_path.name}")
+            print(f"Skipping as pdf is already ingested and no change detected {pdf_path.name}")
             continue
         else:
             print(f"Document {pdf_path.name} has changed. Updating...")
