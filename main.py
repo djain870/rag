@@ -6,6 +6,9 @@ from src._5retriever import search_enterprise_knowledge
 from src._6generator import call_llm, build_prompt, build_context
 from src._7vectordb import upsert_embeddings_to_qdrant, check_document_exists, retrieve_document_hash, delete_document
 from src._8reranker import rerank_documents
+from src._9logger import logger
+
+from langsmith import traceable
 
 
 def prepare_chunks(cleaned_pages, pdf_path, doc_hash):
@@ -28,50 +31,54 @@ def prepare_chunks(cleaned_pages, pdf_path, doc_hash):
             chunk_id +=1
     return all_chunks
 
-def ingest_document(pdf_path, doc_hash):
-    raw_pages = parse_pdf(pdf_path)
-    cleaned_pages = clean_text(raw_pages)
-    all_chunks = prepare_chunks(cleaned_pages, pdf_path, doc_hash)
-    print(f"Total chunks created: {len(all_chunks)}")
-    embeddings = embed_chunks([c["text"] for c in all_chunks])
-    # print("Embeddings generated for all chunks.")
-    upsert_embeddings_to_qdrant(embeddings, all_chunks)
-
+@traceable(name="Get Query Response")
 def get_query_response(query):
     query_embedding = embed_query(query)
-    # results = search_enterprise_knowledge(
-    #     query_vector = query_embedding
-    # )
+    logger.info("Query embedding generated")
     results = build_context(query_embedding)
+    logger.info("Results retrieved from db: %s", results)
     documents = [doc["text"] for doc in results]
-    print(results)
     reranked_docs = rerank_documents(query, documents, top_k=3)
     prompt = build_prompt(query, reranked_docs)
     response = call_llm(prompt)
     return response
 
+@traceable(name="Ingest Document")
+def ingest_document(pdf_path, doc_hash):
+    raw_pages = parse_pdf(pdf_path)
+    cleaned_pages = clean_text(raw_pages)
+    all_chunks = prepare_chunks(cleaned_pages, pdf_path, doc_hash)
+    logger.info("Total chunks created: %s", len(all_chunks))
+    embeddings = embed_chunks([c["text"] for c in all_chunks])
+    # print("Embeddings generated for all chunks.")
+    upsert_embeddings_to_qdrant(embeddings, all_chunks)
 
-def main():
+@traceable(name="Process Documents")
+def process_documents():
     pdf_paths = get_all_pdfs(DATA_DIR)
     #ingest only those documents which are not present or have changed in vectordb
     for pdf_path in pdf_paths:
         doc_hash = get_document_hash(pdf_path)
+        logger.info("Doc hash generated")
         stored_hash = retrieve_document_hash(pdf_path.name)
         #compare with stored hash
         if stored_hash is None:
             ingest_document(pdf_path, doc_hash)
         elif stored_hash == doc_hash:
-            print(f"Skipping as pdf is already ingested and no change detected {pdf_path.name}")
+            logger.info("Skipping as pdf is already ingested and no change detected %s", pdf_path.name)
             continue
         else:
-            print(f"Document {pdf_path.name} has changed. Updating...")
+            logger.info("Document %s has changed. Updating...", pdf_path.name)
             delete_document(pdf_path.name)
-            ingest_document(pdf_path, doc_hash)
+            ingest_document(pdf_path, doc_hash)    
 
-    query = "Who authored document titled 100G Networking technology overview"
+@traceable(name="RAG Pipeline")
+def main(query):
+    process_documents()
     response = get_query_response(query)
-    print(f"Response: {response}")
+    logger.info("Response: %s", response)
+    return response
 
 if __name__ == "__main__":
-    main()
+    main("Who authored document titled 100G Networking technology overview")
 

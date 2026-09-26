@@ -1,9 +1,15 @@
 # from sklearn.metrics.pairwise import cosine_similarity
 from ._1config import QDRANT_COLLECTION, TOP_K, SCORE_THRESHOLD
+from ._9logger import logger
+
+from langsmith import traceable
 from qdrant_client import QdrantClient
 from qdrant_client.models import Filter, FieldCondition, MatchValue
 import os
 
+
+
+@traceable(name="Vector Search")
 def search_enterprise_knowledge(query_vector: str, source = None):
 
     # Using query_points - the modern standard for Qdrant
@@ -32,7 +38,8 @@ def search_enterprise_knowledge(query_vector: str, source = None):
     )
 
     results = []
-    print(f"Total results: {len(response.points)}")
+    logger.info("Total results: %s", len(response.points))
+    # print(f"Total results: {len(response.points)}")
     for res in response.points:
         if res.score < SCORE_THRESHOLD:
             continue
@@ -44,7 +51,8 @@ def search_enterprise_knowledge(query_vector: str, source = None):
             "score": res.score,
             }
         )
-    print(f"Filtered results: {len(results)}")
+    logger.info("Filtered results: %s", len(results))
+    # print(f"Filtered results: {len(results)}")
     return results
 
 

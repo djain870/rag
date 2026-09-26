@@ -1,22 +1,28 @@
 import sentence_transformers
 import numpy as np
+from langsmith import traceable
+
 from src._1config import TOP_K_RERANK
+from src._9logger import logger
 
+# 1. Initialize the Cross-Encoder model
+cross_encoder_model = sentence_transformers.CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
 
+@traceable(name="Cross Encoder Reranker")
 def rerank_documents(query: str, documents: list[str], top_k: int = 3):
     """
     Reranks documents based on their semantic relevance to a query 
     using a Hugging Face CrossEncoder model.
     """
     # 1. Initialize the Cross-Encoder model
-    model = sentence_transformers.CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
+    # model = sentence_transformers.CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
     
     # 2. Pair the query with each document as required by Cross-Encoders
     # The required format is a list of tuples: [(query, doc1), (query, doc2), ...]
     pairs = [(query, doc) for doc in documents]
     
     # 3. Predict similarity scores
-    scores = model.predict(pairs)
+    scores = cross_encoder_model.predict(pairs)
 
     # print(scores)
     # print(type(scores))
@@ -32,7 +38,8 @@ def rerank_documents(query: str, documents: list[str], top_k: int = 3):
             "score": float(scores[idx]),
             "document": documents[idx]
         })
-    print(ranked_results)
+    logger.info("Ranked results: %s", ranked_results)
+    # print(ranked_results)
     # print(type(ranked_results))
     #return top k reranked results only
     return ranked_results[:TOP_K_RERANK]

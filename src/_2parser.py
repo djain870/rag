@@ -1,9 +1,11 @@
 from pathlib import Path
 from pypdf import PdfReader
 import re
+import hashlib
+from langsmith import traceable
 
 from ._1config import DATA_DIR
-import hashlib
+from ._9logger import logger
 
 def get_document_hash(pdf_path: Path) -> str:
     """Return a hash of the PDF contents."""
@@ -18,18 +20,19 @@ def get_first_pdf(data_dir: Path) -> Path:
     pdf_paths = sorted(data_dir.glob("*.pdf"))
     if not pdf_paths:
         raise FileNotFoundError(f"No PDF files found in {data_dir}")
-    print(pdf_paths[0])
+    logger.info("First PDF found: %s", pdf_paths[0])
     return pdf_paths[0]
 
 def get_all_pdfs(data_dir: Path) -> list[Path]:
     pdf_paths = sorted(data_dir.glob("*.pdf"))
 
     if not pdf_paths:
+        logger.exception("No PDF files found in %s", data_dir)
         raise FileNotFoundError(f"No PDF files found in {data_dir}")
 
     return pdf_paths
 
-
+@traceable
 def parse_pdf(pdf_path: Path) -> list[dict]:
     """Extract text from every page in a PDF."""
     reader = PdfReader(pdf_path)
