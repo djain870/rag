@@ -1,82 +1,15 @@
-from src._1config import DATA_DIR, CHUNK_SIZE, CHUNK_OVERLAP
-from src._2parser import parse_pdf, clean_text, get_first_pdf, get_all_pdfs, get_document_hash
-from src._3chunker import chunk_text
-from src._4embedding import embed_chunks, embed_query
-from src._5retriever import search_enterprise_knowledge
-from src._6generator import call_llm, build_prompt, build_context
-from src._7vectordb import upsert_embeddings_to_qdrant, check_document_exists, retrieve_document_hash, delete_document
-from src._8reranker import rerank_documents
 from src._9logger import logger
+from src.services.rag_service import get_query_response
+from src.services.ingest_documents import process_documents
 
 from langsmith import traceable
 
-
-def prepare_chunks(cleaned_pages, pdf_path, doc_hash):
-    all_chunks = []
-    chunk_id = 0
-    for page in cleaned_pages:
-        page_chunks = chunk_text(
-            page["text"],
-            chunk_size = CHUNK_SIZE,
-            chunk_overlap = CHUNK_OVERLAP
-        )
-        for chunk in page_chunks:
-            all_chunks.append({
-                "text": chunk,
-                "source": pdf_path.name,
-                "page": page["page"],
-                "doc_hash": doc_hash,
-                "chunk_id": chunk_id,
-            })
-            chunk_id +=1
-    return all_chunks
-
-@traceable(name="Get Query Response")
-def get_query_response(query):
-    query_embedding = embed_query(query)
-    logger.info("Query embedding generated")
-    results = build_context(query_embedding)
-    logger.info("Results retrieved from db: %s", results)
-    documents = [doc["text"] for doc in results]
-    reranked_docs = rerank_documents(query, documents, top_k=3)
-    prompt = build_prompt(query, reranked_docs)
-    response = call_llm(prompt)
-    return response
-
-@traceable(name="Ingest Document")
-def ingest_document(pdf_path, doc_hash):
-    raw_pages = parse_pdf(pdf_path)
-    cleaned_pages = clean_text(raw_pages)
-    all_chunks = prepare_chunks(cleaned_pages, pdf_path, doc_hash)
-    logger.info("Total chunks created: %s", len(all_chunks))
-    embeddings = embed_chunks([c["text"] for c in all_chunks])
-    # print("Embeddings generated for all chunks.")
-    upsert_embeddings_to_qdrant(embeddings, all_chunks)
-
-@traceable(name="Process Documents")
-def process_documents():
-    pdf_paths = get_all_pdfs(DATA_DIR)
-    #ingest only those documents which are not present or have changed in vectordb
-    for pdf_path in pdf_paths:
-        doc_hash = get_document_hash(pdf_path)
-        logger.info("Doc hash generated")
-        stored_hash = retrieve_document_hash(pdf_path.name)
-        #compare with stored hash
-        if stored_hash is None:
-            ingest_document(pdf_path, doc_hash)
-        elif stored_hash == doc_hash:
-            logger.info("Skipping as pdf is already ingested and no change detected %s", pdf_path.name)
-            continue
-        else:
-            logger.info("Document %s has changed. Updating...", pdf_path.name)
-            delete_document(pdf_path.name)
-            ingest_document(pdf_path, doc_hash)    
 
 @traceable(name="RAG Pipeline")
 def main(query):
     process_documents()
     response = get_query_response(query)
-    logger.info("Response: %s", response)
+    logger.info("Response: %s", response["answer"])
     return response
 
 if __name__ == "__main__":
