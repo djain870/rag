@@ -1,12 +1,13 @@
-from openai import OpenAI
+from openai import OpenAI, AsyncOpenAI
 from dotenv import load_dotenv
 from langsmith import traceable
 
 from ._5retriever import search_enterprise_knowledge
 from ._9logger import logger
+import asyncio
 
 load_dotenv()
-client = OpenAI()
+client = AsyncOpenAI()
 
 def build_context(query_embedding: list[float]) -> str:
     """Build the context for the LLM based on the query."""
@@ -38,10 +39,10 @@ Question:
 """
 
 @traceable(name="LLM Call")
-def call_llm(prompt: str) -> str:
+async def call_llm(prompt: str) -> str:
     """Send a prompt to the LLM."""
-
-    response = client.chat.completions.create(
+    logger.info("Prompt: %s", prompt)
+    response = await client.chat.completions.create(
         model="gpt-4o",
         messages=[
             {
