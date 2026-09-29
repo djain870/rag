@@ -1,12 +1,20 @@
-from qdrant_client import QdrantClient
-from qdrant_client.models import Distance, VectorParams, PointStruct
-from qdrant_client.models import Filter, FieldCondition, MatchValue, FilterSelector
-from ._1config import QDRANT_COLLECTION
-from ._9logger import logger
+import os
 import uuid
 
-import os
 from dotenv import load_dotenv
+from qdrant_client import QdrantClient
+from qdrant_client.models import (
+    Distance,
+    FieldCondition,
+    Filter,
+    FilterSelector,
+    MatchValue,
+    PointStruct,
+    VectorParams,
+)
+
+from ._1config import QDRANT_COLLECTION
+from ._9logger import logger
 
 load_dotenv()
 

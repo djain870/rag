@@ -1,11 +1,10 @@
+
 from langsmith import traceable
-import asyncio
 
 from src._4embedding import embed_query
-from src._8reranker import rerank_documents
 from src._6generator import build_context, build_prompt, call_llm
+from src._8reranker import rerank_documents
 from src._9logger import logger
-
 
 
 @traceable(name="Get Query Response")

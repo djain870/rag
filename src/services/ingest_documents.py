@@ -1,9 +1,14 @@
 from langsmith import traceable
-from src._1config import DATA_DIR, CHUNK_SIZE, CHUNK_OVERLAP
-from src._2parser import parse_pdf, clean_text, get_all_pdfs, get_document_hash
+
+from src._1config import CHUNK_OVERLAP, CHUNK_SIZE, DATA_DIR
+from src._2parser import clean_text, get_all_pdfs, get_document_hash, parse_pdf
 from src._3chunker import chunk_text
 from src._4embedding import embed_chunks
-from src._7vectordb import upsert_embeddings_to_qdrant, retrieve_document_hash, delete_document
+from src._7vectordb import (
+    delete_document,
+    retrieve_document_hash,
+    upsert_embeddings_to_qdrant,
+)
 from src._9logger import logger
 
 

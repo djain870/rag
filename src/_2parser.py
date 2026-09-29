@@ -1,11 +1,13 @@
-from pathlib import Path
-from pypdf import PdfReader
-import re
 import hashlib
+import re
+from pathlib import Path
+
 from langsmith import traceable
+from pypdf import PdfReader
 
 from ._1config import DATA_DIR
 from ._9logger import logger
+
 
 def get_document_hash(pdf_path: Path) -> str:
     """Return a hash of the PDF contents."""
