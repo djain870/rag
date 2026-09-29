@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.env
+myenv/
+learn_python.ipynb
+qdrant_storage/
+DATA/
