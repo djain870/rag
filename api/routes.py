@@ -1,12 +1,9 @@
-from fastapi import APIRouter
-from api.models import ChatResponse, ChatRequest, IngestResponse
-from src.services.rag_service import get_query_response
-from src.services.ingest_documents import process_documents
-import time
-from datetime import datetime
-import asyncio
 
-from src._9logger import logger
+from fastapi import APIRouter
+
+from api.models import ChatRequest, ChatResponse, IngestResponse
+from src.services.ingest_documents import process_documents
+from src.services.rag_service import get_query_response
 
 router = APIRouter()
 
@@ -16,12 +13,6 @@ router = APIRouter()
 def health():
     return {
         "status": "healthy"
-    }
-
-@router.get("/chat")
-def chat():
-    return {
-        "status": "chat"
     }
 
 @router.post("/chat", response_model=ChatResponse)

@@ -1,8 +1,8 @@
-from src._9logger import logger
-from src.services.rag_service import get_query_response
-from src.services.ingest_documents import process_documents
-
 from langsmith import traceable
+
+from src._9logger import logger
+from src.services.ingest_documents import process_documents
+from src.services.rag_service import get_query_response
 
 
 @traceable(name="RAG Pipeline")

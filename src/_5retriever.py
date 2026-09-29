@@ -1,12 +1,12 @@
 # from sklearn.metrics.pairwise import cosine_similarity
-from ._1config import QDRANT_COLLECTION, TOP_K, SCORE_THRESHOLD
-from ._9logger import logger
+import os
 
 from langsmith import traceable
 from qdrant_client import QdrantClient
-from qdrant_client.models import Filter, FieldCondition, MatchValue
-import os
+from qdrant_client.models import FieldCondition, Filter, MatchValue
 
+from ._1config import QDRANT_COLLECTION, SCORE_THRESHOLD, TOP_K
+from ._9logger import logger
 
 
 @traceable(name="Vector Search")

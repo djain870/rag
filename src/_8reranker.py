@@ -1,5 +1,5 @@
-import sentence_transformers
 import numpy as np
+import sentence_transformers
 from langsmith import traceable
 
 from src._1config import TOP_K_RERANK
