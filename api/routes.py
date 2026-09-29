@@ -1,5 +1,8 @@
 
 from fastapi import APIRouter
+from qdrant_client import QdrantClient
+import os
+from dotenv import load_dotenv
 
 from api.models import ChatRequest, ChatResponse, IngestResponse
 from src.services.ingest_documents import process_documents
@@ -7,7 +10,7 @@ from src.services.rag_service import get_query_response
 
 router = APIRouter()
 
-
+load_dotenv()
 
 @router.get("/health")
 def health():
@@ -25,6 +28,14 @@ async def chat(request: ChatRequest):
 def ingest():
     return process_documents()
 
+@router.get("/qdrant-health")
+def qdrant_health():
+    client = QdrantClient(
+        url = os.getenv("QDRANT_CLUSTER_ENDPOINT"),
+        api_key = os.getenv("QDRANT_API_KEY"),
+    )
+    result = client.get_collections()
+    return {"status": "ok"}
 
 # @router.get("/sleep")
 # async def sleep():
