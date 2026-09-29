@@ -3,6 +3,7 @@ from fastapi import APIRouter
 from qdrant_client import QdrantClient
 import os
 from dotenv import load_dotenv
+import requests
 
 from api.models import ChatRequest, ChatResponse, IngestResponse
 from src.services.ingest_documents import process_documents
@@ -36,6 +37,14 @@ def qdrant_health():
     )
     result = client.get_collections()
     return {"status": "ok"}
+
+
+@router.get("/network-test")
+def network_test():
+    response = requests.get("https://www.google.com", timeout=10)
+    return {
+        "status": response.status_code
+    }
 
 # @router.get("/sleep")
 # async def sleep():
