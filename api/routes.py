@@ -29,32 +29,6 @@ async def chat(request: ChatRequest):
 def ingest():
     return process_documents()
 
-@router.get("/qdrant-health")
-def qdrant_health():
-    client = QdrantClient(
-        url = os.getenv("QDRANT_CLUSTER_ENDPOINT"),
-        api_key = os.getenv("QDRANT_API_KEY"),
-        timeout = 10000
-    )
-    result = client.get_collections()
-    return {"status": "ok"}
-
-
-@router.get("/network-test")
-def network_test():
-    response = requests.get("https://www.google.com", timeout=10)
-    return {
-        "status": response.status_code
-    }
-
-@router.get("/config-test")
-def config_test():
-    import os
-
-    return {
-        "endpoint": os.getenv("QDRANT_CLUSTER_ENDPOINT"),
-        "api_key": os.getenv("QDRANT_API_KEY")
-    }
 
 
 import os
@@ -62,58 +36,25 @@ import socket
 import urllib.request
 from fastapi import APIRouter
 
-router = APIRouter()
 
 @router.get("/qdrant-health")
 def qdrant_health():
-    # 1. Parse host from environment variable
-    raw_url = os.getenv("QDRANT_CLUSTER_ENDPOINT", "")
-    # Clean up URL to get clean hostname (removes https:// and ports)
-    host = raw_url.replace("https://", "").replace("http://", "").split(":")[0].split("/")[0]
+    # Force the client to use port 443 and explicit HTTPS settings
+    client = QdrantClient(
+        url="https://10d22751-c9d1-4106-81de-93303760d055.australia-southeast1-0.gcp.cloud.qdrant.io",
+        port=443,               # Force port 443 explicitly
+        https=True,             # Force HTTPS
+        api_key=os.getenv("QDRANT_API_KEY"),
+        timeout=30              # 30 seconds is plenty now that the port is correct
+    )
     
-    diagnostic_results = {
-        "configured_url": raw_url,
-        "extracted_host": host,
-        "step_1_dns_resolution": "Not tested",
-        "step_2_raw_tcp_connect": "Not tested",
-        "step_3_http_handshake": "Not tested"
-    }
-
-    if not host:
-        return {"status": "error", "message": "QDRANT_CLUSTER_ENDPOINT env var is missing or empty"}
-
-    # --- STEP 1: TEST DNS RESOLUTION ---
     try:
-        ip = socket.gethostbyname(host)
-        diagnostic_results["step_1_dns_resolution"] = f"SUCCESS: Resolved to {ip}"
+        # This will now route through the open 443 port with authentication
+        result = client.get_collections()
+        return {"status": "ok", "collections": [c.name for c in result.collections]}
     except Exception as e:
-        diagnostic_results["step_1_dns_resolution"] = f"FAILED: {str(e)}"
-        return {"status": "network_issue", "details": diagnostic_results}
+        return {"status": "client_error", "error": str(e)}
 
-    # --- STEP 2: TEST RAW PORT CONNECTIVITY ---
-    # We will try port 443 (HTTPS) and port 6333 (Default Qdrant HTTP)
-    ports_to_test = [443, 6333]
-    tcp_statuses = []
-    for port in ports_to_test:
-        try:
-            with socket.create_connection((host, port), timeout=5):
-                tcp_statuses.append(f"Port {port}: OPEN")
-        except Exception as e:
-            tcp_statuses.append(f"Port {port}: CLOSED/TIMEOUT ({str(e)})")
-    
-    diagnostic_results["step_2_raw_tcp_connect"] = " | ".join(tcp_statuses)
-
-    # --- STEP 3: TEST SIMPLE HTTP GET ---
-    try:
-        # Try to ping Qdrant's native health endpoint via standard python urllib
-        # Using a short 5-second timeout so the app doesn't hang forever
-        req_url = f"https://{host}/health" if "https" in raw_url else f"http://{host}:6333/health"
-        with urllib.request.urlopen(req_url, timeout=5) as response:
-            diagnostic_results["step_3_http_handshake"] = f"SUCCESS: Status {response.getcode()}"
-    except Exception as e:
-        diagnostic_results["step_3_http_handshake"] = f"FAILED: {str(e)}"
-
-    return {"status": "diagnostic_complete", "details": diagnostic_results}
 
 # @router.get("/sleep")
 # async def sleep():
