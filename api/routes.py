@@ -49,12 +49,25 @@ def network_test():
 @router.get("/config-test")
 def config_test():
     import os
+    from qdrant_client import QdrantClient
 
-    return {
-        "qdrant_endpoint": bool(os.getenv("QDRANT_CLUSTER_ENDPOINT")),
-        "qdrant_api_key": bool(os.getenv("QDRANT_API_KEY")),
-        "openai_api_key": bool(os.getenv("OPENAI_API_KEY")),
-    }
+    client = QdrantClient(
+        url=os.environ["QDRANT_CLUSTER_ENDPOINT"],
+        api_key=os.environ["QDRANT_API_KEY"],
+        timeout=10,
+    )
+
+    try:
+        result = client.get_collections()
+        return {
+            "qdrant": "connected",
+            "collections": len(result.collections),
+        }
+    except Exception as e:
+        return {
+            "qdrant": "failed",
+            "error": str(e),
+        }
 # @router.get("/sleep")
 # async def sleep():
 #     # print("started")
