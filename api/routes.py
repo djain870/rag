@@ -29,32 +29,8 @@ async def chat(request: ChatRequest):
 def ingest():
     return process_documents()
 
-@router.get("/qdrant-health")
-def qdrant_health():
-    client = QdrantClient(
-        url = os.getenv("QDRANT_CLUSTER_ENDPOINT"),
-        api_key = os.getenv("QDRANT_API_KEY"),
-        timeout = 10000
-    )
-    result = client.get_collections()
-    return {"status": "ok"}
 
 
-@router.get("/network-test")
-def network_test():
-    response = requests.get("https://www.google.com", timeout=10)
-    return {
-        "status": response.status_code
-    }
-
-@router.get("/config-test")
-def config_test():
-    import os
-
-    return {
-        "endpoint": os.getenv("QDRANT_CLUSTER_ENDPOINT"),
-        "api_key": os.getenv("QDRANT_API_KEY")
-    }
 # @router.get("/sleep")
 # async def sleep():
 #     # print("started")

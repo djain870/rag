@@ -22,6 +22,9 @@ def retrieve_document_hash(source: str) -> str:
     client = QdrantClient(
         url = os.getenv("QDRANT_CLUSTER_ENDPOINT"),
         api_key = os.getenv("QDRANT_API_KEY"),
+        port = 443,
+        https = True,
+        timeout = 30,
     )
     query_filter = None
     if source:
@@ -50,6 +53,9 @@ def delete_document(source: str) -> str:
     client = QdrantClient(
         url = os.getenv("QDRANT_CLUSTER_ENDPOINT"),
         api_key = os.getenv("QDRANT_API_KEY"),
+        port = 443,
+        https = True,
+        timeout = 30,
     )
     query_filter = None
     if source:
@@ -76,6 +82,9 @@ def check_document_exists(source: str) -> bool:
     client = QdrantClient(
         url = os.getenv("QDRANT_CLUSTER_ENDPOINT"),
         api_key = os.getenv("QDRANT_API_KEY"),
+        port = 443,
+        https = True,
+        timeout = 30,
     )
     query_filter = None
     if source:
@@ -107,6 +116,9 @@ def initialize_qdrant_collection():
     client = QdrantClient(
         url = os.getenv("QDRANT_CLUSTER_ENDPOINT"),
         api_key = os.getenv("QDRANT_API_KEY"),
+        port = 443,
+        https = True,
+        timeout = 30,
     )
 
     # 2. Create a collection (Specify the size of your embeddings and distance metric)
