@@ -34,6 +34,7 @@ def qdrant_health():
     client = QdrantClient(
         url = os.getenv("QDRANT_CLUSTER_ENDPOINT"),
         api_key = os.getenv("QDRANT_API_KEY"),
+        timeout = 10000
     )
     result = client.get_collections()
     return {"status": "ok"}
