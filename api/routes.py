@@ -46,6 +46,15 @@ def network_test():
         "status": response.status_code
     }
 
+@router.get("/config-test")
+def config_test():
+    import os
+
+    return {
+        "qdrant_endpoint": bool(os.getenv("QDRANT_CLUSTER_ENDPOINT")),
+        "qdrant_api_key": bool(os.getenv("QDRANT_API_KEY")),
+        "openai_api_key": bool(os.getenv("OPENAI_API_KEY")),
+    }
 # @router.get("/sleep")
 # async def sleep():
 #     # print("started")
