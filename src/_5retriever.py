@@ -16,6 +16,9 @@ def search_enterprise_knowledge(query_vector: str, source = None):
     client = QdrantClient(
         url = os.getenv("QDRANT_CLUSTER_ENDPOINT"),
         api_key = os.getenv("QDRANT_API_KEY"),
+        port = 443,
+        https = True,
+        timeout = 30,
     )
 
     query_filter = None
