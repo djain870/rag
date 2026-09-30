@@ -31,31 +31,6 @@ def ingest():
 
 
 
-import os
-import socket
-import urllib.request
-from fastapi import APIRouter
-
-
-@router.get("/qdrant-health")
-def qdrant_health():
-    # Force the client to use port 443 and explicit HTTPS settings
-    client = QdrantClient(
-        url="https://10d22751-c9d1-4106-81de-93303760d055.australia-southeast1-0.gcp.cloud.qdrant.io",
-        port=443,               # Force port 443 explicitly
-        https=True,             # Force HTTPS
-        api_key=os.getenv("QDRANT_API_KEY"),
-        timeout=30              # 30 seconds is plenty now that the port is correct
-    )
-    
-    try:
-        # This will now route through the open 443 port with authentication
-        result = client.get_collections()
-        return {"status": "ok", "collections": [c.name for c in result.collections]}
-    except Exception as e:
-        return {"status": "client_error", "error": str(e)}
-
-
 # @router.get("/sleep")
 # async def sleep():
 #     # print("started")
