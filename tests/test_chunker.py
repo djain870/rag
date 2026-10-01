@@ -1,4 +1,4 @@
-from src._3chunker import chunk_text
+from src._3chunker_unused import chunk_text
 
 
 def test_chunk_text():

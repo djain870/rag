@@ -47,7 +47,7 @@ def retrieve_document_hash(source: str) -> str:
     if len(response[0]) == 0:
         return None
 
-    return response[0][0].payload.get("doc_hash")
+    return response[0][0].payload.get("document_hash")
 
 def delete_document(source: str) -> str:
     client = QdrantClient(
@@ -149,8 +149,20 @@ def upsert_embeddings_to_qdrant(embeddings, chunks):
 
     # 3. Save your embeddings as "Points"
     points = [
-        PointStruct(id=str(uuid.uuid4()), vector=vector, payload=meta)
-        for vector, meta in zip(embeddings, chunks)
+        PointStruct(
+            id=str(uuid.uuid4()), 
+            vector=vector, 
+            payload={
+                "text": chunk["text"],
+                "source": chunk["metadata"]["source"],
+                "document_type": chunk["metadata"]["document_type"],
+                "document_hash": chunk["metadata"]["document_hash"],
+                "chunk_index": index,
+                "page": chunk["metadata"]["page"],
+                "headings": chunk["metadata"]["headings"],
+            },
+        )
+        for index, (vector, chunk) in enumerate(zip(embeddings, chunks))
     ]
     client.upsert(collection_name=collection_name, points=points)
 

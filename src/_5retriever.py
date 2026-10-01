@@ -49,8 +49,11 @@ def search_enterprise_knowledge(query_vector: str, source = None):
         results.append({
             "text": res.payload.get("text", ""),
             "source": res.payload.get("source", ""),
+            "document_type": res.payload.get("document_type", ""),
+            "document_hash": res.payload.get("document_hash", ""),
             "page": res.payload.get("page", ""),
-            "chunk_id": res.payload.get("chunk_id", ""),
+            "headings": res.payload.get("headings", ""),
+            "chunk_index": res.payload.get("chunk_index", ""),
             "score": res.score,
             }
         )

@@ -1,9 +1,7 @@
 
-from fastapi import APIRouter
-from qdrant_client import QdrantClient
-import os
+
 from dotenv import load_dotenv
-import requests
+from fastapi import APIRouter
 
 from api.models import ChatRequest, ChatResponse, IngestResponse
 from src.services.ingest_documents import process_documents
