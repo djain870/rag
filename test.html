@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<title>100G Networking Technology Overview - Slides - Toronto (August 2016)</title>
+<meta name="generator" content="Docling HTML Serializer"/>
+<style>
+    html {
+        background-color: #f5f5f5;
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+    }
+    body {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem;
+        background-color: white;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1, h2, h3, h4, h5, h6 {
+        color: #333;
+        margin-top: 1.5em;
+        margin-bottom: 0.5em;
+    }
+    h1 {
+        font-size: 2em;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 0.3em;
+    }
+    table {
+        border-collapse: collapse;
+        margin: 1em 0;
+        width: 100%;
+    }
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+    th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+    }
+    figure {
+        margin: 1.5em 0;
+        text-align: center;
+    }
+    figcaption {
+        color: #666;
+        font-style: italic;
+        margin-top: 0.5em;
+    }
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+    pre {
+        background-color: #f6f8fa;
+        border-radius: 3px;
+        padding: 1em;
+        overflow: auto;
+    }
+    code {
+        font-family: monospace;
+        background-color: #f6f8fa;
+        padding: 0.2em 0.4em;
+        border-radius: 3px;
+    }
+    pre code {
+        background-color: transparent;
+        padding: 0;
+    }
+    .formula {
+        text-align: center;
+        padding: 0.5em;
+        margin: 1em 0;
+        background-color: #f9f9f9;
+    }
+    .formula-not-decoded {
+        text-align: center;
+        padding: 0.5em;
+        margin: 1em 0;
+        background: repeating-linear-gradient(
+            45deg,
+            #f0f0f0,
+            #f0f0f0 10px,
+            #f9f9f9 10px,
+            #f9f9f9 20px
+        );
+    }
+    .page-break {
+        page-break-after: always;
+        border-top: 1px dashed #ccc;
+        margin: 2em 0;
+    }
+    .key-value-region {
+        background-color: #f9f9f9;
+        padding: 1em;
+        border-radius: 4px;
+        margin: 1em 0;
+    }
+    .key-value-region dt {
+        font-weight: bold;
+    }
+    .key-value-region dd {
+        margin-left: 1em;
+        margin-bottom: 0.5em;
+    }
+    .form-container {
+        border: 1px solid #ddd;
+        padding: 1em;
+        border-radius: 4px;
+        margin: 1em 0;
+    }
+    .form-item {
+        margin-bottom: 0.5em;
+    }
+    .image-classification {
+        font-size: 0.9em;
+        color: #666;
+        margin-top: 0.5em;
+    }
+    details.docling-meta {
+        margin: 0.5em 0;
+        font-size: 0.9em;
+        text-align: left;
+    }
+    figure details.docling-meta {
+        text-align: left;
+    }
+    details.docling-meta > summary {
+        cursor: pointer;
+        color: #555;
+        font-style: italic;
+        padding: 2px 6px;
+    }
+    .docling-meta-field {
+        background-color: #f0f0f0;
+        border-left: 3px solid #ccc;
+        padding: 6px 10px;
+        margin: 4px 0 4px 1em;
+        border-radius: 3px;
+        text-align: left;
+    }
+    .docling-meta-field-label {
+        font-weight: bold;
+        color: #444;
+    }
+    pre.docling-meta-code {
+        background-color: #1e1e1e;
+        color: #d4d4d4;
+        border-radius: 4px;
+        padding: 10px 12px;
+        margin: 6px 0;
+        overflow-x: auto;
+        font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+        font-size: 0.85em;
+        line-height: 1.45;
+        white-space: pre;
+        tab-size: 4;
+    }
+    pre.docling-meta-code code {
+        background: transparent;
+        border: none;
+        padding: 0;
+        color: inherit;
+        font-family: inherit;
+        font-size: inherit;
+        display: block;
+        white-space: pre;
+    }
+</style>
+</head>
+<body>
+<div class='page'>
+<h2>100G Networking Technology Overview</h2>
+<p>1</p>
+<h2>Why 100G now?</h2>
+<ul>
+<li>¥ Capacity and speed requirements on data links keep increasing.</li>
+<li>¥ Fiber link reuse in the Connectivity providers (Allows Telcos to make better use of WAN links)</li>
+<li>¥ Servers have begun to be capable of sustaining 100G to memory (Intel Skylake, IBM Power8+)</li>
+<li>¥ Machine Learning Algorithms require more bandwidth</li>
+<li>¥ Exascale Vision for 2020 of the US DoE to move the industry ahead.</li>
+</ul>
+<h2>100G Networking Technologies</h2>
+<ul>
+<li>¥ 10 x 10G Link old standard CFP C??. Expensive. Lots of cabling. Has been in use for awhile for specialized uses.</li>
+<li>¥ New 4 x 28G link standards "QSFP28". Brings down price to ranges of SFP and QSFP. Compact and designed to replace 10G and 40G networking.</li>
+<li>¥ Infiniband (EDR)</li>
+<li>o Standard pushed by Mellanox.</li>
+<li>o Transitioning to lower Infiniband speeds through switches.</li>
+<li>o Most mature technology to date. Switches and NICs are available.</li>
+<li>¥ Ethernet</li>
+<li>o Early deployment in 2015.</li>
+<li>o But most widely used chipset for switches recalled to be respun.</li>
+<li>o NICs are under development. Mature one is the Mellanox EDR adapter that can run in 100G Ethernet mode.</li>
+<li>o Maybe ready mid 2016.</li>
+<li>¥ Omnipath (Intel)</li>
+<li>¥ Redesigned serialization. No legacy issues with Infiniband. More nodes. Designed for Exascale vision. Immature. Vendor claims production readiness but what is available has the character of an alpha release with limited functionality. Estimate that this is going to be more mature at the end of 2016.</li>
+</ul>
+<figure><figcaption><div class="caption">100 Gigabit Ethernet = 4 x 25 GbE</div></figcaption></figure>
+<h2>Splitting 100G Ethernet to 25G and 50G</h2>
+<ul>
+<li>¥ 100G is actually 4x25g (QSFP28), so 100G Ports can be split with Òoctopus cablesÓ to lower speed.</li>
+<li>¥ 50G (2x25) and 25G (1x25G) speeds are available which doubles or quadruples the port density of switches.</li>
+<li>¥ Some switches can handle 32 links of 100G, 64 of 50G and 128 of 25G.</li>
+<li>¥ It was a late idea. So 25G Ethernet standards are scheduled to be completed in 2016 only. Vendors are designing to a proposed standard.</li>
+<li>¥ 50G Ethernet standard is in the works (2018-2020). May be the default in the future since storage speeds and memory speeds increase.</li>
+<li>¥ 100G Ethernet done</li>
+<li>¥ 25G Ethernet has a new connector standard called SFP28</li>
+</ul>
+<h2>100G Cabling and Connectors</h2>
+<h2>100G Switches</h2>
+<table><tbody><tr><td></td><th>Ports</th><th>Status</th><th>Name</th></tr><tr><td>Mellanox Infiniband</td><td>EDR x 36</td><td>Released. Stable.</td><td>7700 Series</td></tr><tr><td>Broadcom</td><td>100G x 32 50G x 64 25G x 128</td><td>Rereleased after silicon problem.</td><td>Tomahawk Chip</td></tr><tr><td>Mellanox Ethernet</td><td>100G x 32 50G x 64</td><td>2Q ?</td><td>Spectrum</td></tr><tr><td>Intel</td><td>Omnipath x 48</td><td>Available</td><td>100 Series</td></tr></tbody></table>
+<h2>Overwhelmed by data</h2>
+<table><tbody><tr><th>Ethernet</th><th>10M</th><th>100M (Fast)</th><th>1G (Gigabit)</th><th>10G</th><th>100G</th></tr><tr><td>Time per bit</td><td>100 ns</td><td>10 ns</td><td>1 ns</td><td>0.1 ns</td><td>0.01 ns</td></tr><tr><td>Time for a MTU size frame 1500 bytes</td><td>1500 us</td><td>150 us</td><td>15 us</td><td>1.5 us</td><td>150 ns</td></tr><tr><td>Time for a 64 byte packet</td><td>64 us</td><td>6.4 us</td><td>640 ns</td><td>64 ns</td><td>6.4 ns</td></tr><tr><td>Packets per second</td><td>~10 K</td><td>~100 K</td><td>~1 M</td><td>~10 M</td><td>~100 M</td></tr><tr><td>Packets per 10 us</td><td></td><td>2 (small)</td><td>20 (small)</td><td>6 (MTU)</td><td>60 (MTU)</td></tr></tbody></table>
+<h2>No time to process what you get?</h2>
+<ul>
+<li>¥ NICs have the problem of how to get the data to the application</li>
+<li>¥ Flow Steering in the kernel allows the distribution of packets to multiple processors so that the processing scales. But there are not enough processing cores for 100G.</li>
+<li>¥ NICs have extensive logic to offload operations and distribute the load.</li>
+<li>¥ One NIC supports multiple servers of diverse architectures simultaneously.</li>
+<li>¥ Support for virtualization. SR-IOV etc.</li>
+<li>¥ Switch like logic on the chip.</li>
+</ul>
+<p>= 1/1000000 seconds</p>
+<pre><code>1 us = 1 microsecond 1 ns = 1 nanosecond</code></pre>
+<p>= 1/1000 us</p>
+<p>Network send or receive syscall: 10-20 us</p>
+<p>Main memory access: ~100 ns</p>
+<h2>Available 100G NICs</h2>
+<h2>¥ Mellanox ConnectX4 Adapter</h2>
+<ul>
+<li>¥ 100G Ethernet</li>
+<li>¥ EDR Infiniband</li>
+<li>¥ Sophisticated offloads.</li>
+<li>¥ Multi-Host</li>
+<li>¥ Evolution of ConnectX3</li>
+</ul>
+<h2>¥ Intel Omnipath Adapter</h2>
+<ul>
+<li>¥ Focus on MPI</li>
+<li>¥ Omnipath only</li>
+<li>¥ Redesign of IB protocol to be a ÒFabricÓ</li>
+<li>¥ ÒFabric AdapterÓ. New Fabric APIs.</li>
+<li>¥ More nodes larger transfer sizes</li>
+</ul>
+<h2>Application Interfaces and 100G</h2>
+<ul>
+<li>1.Socket API (Posix)</li>
+</ul>
+<p>Run existing apps. Large code base. Large set of developers that know how to use the programming interface</p>
+<p>2.Block level File I/O Network Layer Interaction</p>
+<p>Another POSIX API. Remote filesystems like NFS may use NFSoRDMA etc 3.RDMA API</p>
+<ul>
+<li>1.One sided transfers</li>
+<li>2.Receive/SendQ in user space</li>
+<li>3.Talk directly to the hardware.</li>
+</ul>
+<h2>4.OFI</h2>
+<p>Fabric API designed for application interaction not with the network but the ÒFabricÓ</p>
+<p>5.DPDK</p>
+<p>Low level access to NIC from user space.</p>
+<h2>Using the Socket APIs with 100G</h2>
+<ul>
+<li>¥ Problem of queuing if you have a fast talker.</li>
+<li>¥ Flow steering to scale to multipe processors</li>
+<li>¥ Per processor queues to scale sending.</li>
+<li>¥ Exploit offloads to send / receive large amounts of data</li>
+<li>¥ May use protocol with congestion control (TCP) but then not able to use full bandwidth. Congestion control not tested with 100G.</li>
+<li>¥ Restricted to Ethernet 100G. Use on non Ethernet Fabrics (IPoIB, IPoFabric) has various non Ethernet semantics. F.e. Layer 2 behaves differently and may offer up surprises.</li>
+</ul>
+<h2>RDMA / Infiniband API</h2>
+<ul>
+<li>¥ Allow use of native Infiniband functionality designed for higher speed.</li>
+<li>¥ Supports both Infiniband and Onmipath.</li>
+<li>¥ Single sided transfers via memory registration or classic messaging.</li>
+<li>¥ Offload behavior by having RX and TX rings in user space.</li>
+<li>¥ Group send / receive possible.</li>
+<li>¥ Control of RDMA/Infiniband from user space with API that is process safe but allows direct interaction with an instance of the NIC.</li>
+<li>¥ Can be used on Ethernet via ROCE and/or ROCEv2</li>
+<li>¥ Generally traffic is not routable (ROCE V2 and Ethernet messaging of course is). Problem of getting into and out of fabric. Requires specialized gateways.</li>
+</ul>
+<h2>OFI (aka libfabric)</h2>
+<ul>
+<li>¥ Recent project by OFA to design a new API.</li>
+<li>¥ Based on RDMA concepts.</li>
+<li>¥ Driven by Intel to have an easier API than the ugly RDMA APIs. OFI is focusing on the application needs from a Fabric.</li>
+<li>¥ Tested and developed for the needs of MPI at this point.</li>
+<li>¥ Ability to avoid the RDMA kernel API via ÒnativeÓ drivers. Drivers can define API to their own user space libraries.</li>
+<li>¥ Lack of some general functionality like Multicast.</li>
+<li>¥ Immature at this point. Promise for the future to solve some of the issue coming with 100G networking.</li>
+</ul>
+<h2>Software Support for 100G technology</h2>
+<p>EDR via Mellanox ConnectX4 Adapter - Linux 4.3. Redhat 7.2</p>
+<p>Ethernet via Mellanox ConnectX4 Adapter</p>
+<p>- Linux 4.5. Redhat 7.3. (7.2 has only socket layer support).</p>
+<p>Omnipath via Intel OPA adapter</p>
+<p>- Out of tree drivers, in Linux 4.4 staging.</p>
+<p>Currently supported via Intel OFED</p>
+<p>distribution</p>
+<h2>Test Hardware</h2>
+<ul>
+<li>o Intel(R) Xeon(R) CPU E5-2667 v3 @ 3.20GHz</li>
+<li>¥ Adapters</li>
+<li>o Intel Omni-Path Host Fabric Interface Adapter</li>
+<li>¥ Driver Version: 0.11-162</li>
+<li>¥ Opa Version: 10.1.1.0.9</li>
+<li>o Mellanox ConnectX-4 VPI Adapter</li>
+<li>¥ Driver Version: Stock RHEL 7.2</li>
+<li>¥ Firmware Version: 12.16.1020</li>
+<li>¥ Switches</li>
+<li>o Intel 100 OPA Edge 48p</li>
+<li>¥ Firmware Version: 10.1.0.0.133</li>
+<li>o Mellanox SB7700</li>
+<li>¥ Firmware Version: 3.4.3050</li>
+</ul>
+<h2>Latency Tests via RDMA APIs(ib_send_lat)</h2>
+<ul>
+<li style="list-style-type: '- ';">Consistently low latency below 50% of 1G Ethernet.</li>
+<li style="list-style-type: '- ';">Higher packet sizes benefit significantly.</li>
+<li style="list-style-type: '- ';">Omnipath has higher latency due to software processing of send/receive requests.</li>
+</ul>
+<h2>Bandwidth Tests using RDMA APIs (ib_send_bw)</h2>
+<ul>
+<li style="list-style-type: '- ';">EDR can reach line saturation (~12GB/sec) at ~ 2k packet size</li>
+<li style="list-style-type: '- ';">Small packet processing is superior on EDR.</li>
+<li style="list-style-type: '- ';">10GE (1GB/sec) and 1G (120GB/sec) saturate the line with small packets early</li>
+</ul>
+<h2>Multicast latency tests</h2>
+<ul>
+<li style="list-style-type: '- ';">Lowest latency with 100G and 10G Ethernet</li>
+<li style="list-style-type: '- ';">Slightly higher latency of EDR due to Forward Error Correction</li>
+<li style="list-style-type: '- ';">Software processing increases packet latency on Omnipath</li>
+</ul>
+<h2>RDMA vs. Posix Sockets (30 byte payload)</h2>
+<h2>RDMA vs. Posix Sockets (1000 byte Payload)</h2>
+<p>Latency (us)</p>
+<h2>Further Reading Material</h2>
+<a href="http://presentations.interop.com/events/las-vegas/2015/open-to-all---keynote-presentations/download/2709"><p>http://presentations.interop.com/events/las-vegas/2015/open-to-all---keynotepresentations/download/2709</p></a>
+<a href="https://en.wikipedia.org/wiki/100_Gigabit_Ethernet"><p>https://en.wikipedia.org/wiki/100_Gigabit_Ethernet</p></a>
+<a href="http://www.ieee802.org/3/index.html"><p>http://www.ieee802.org/3/index.html</p></a>
+<h2>Memory Performance issues with 100G</h2>
+<ul>
+<li>¥ 100G NIC can give you 12.5G Byte per second of throughput</li>
+<li>¥ DDR3 memory in basic configuration at 6.5 Gbyte per sec. High end at 17G byte per second.</li>
+<li>¥ DDR4 12.8G - 19.2G byte per sec.</li>
+<li>¥ Some adapter have dual 100G connectors.</li>
+<li>¥ Memory via the NIC traffic may be able to saturate the system.</li>
+</ul>
+<h2>Looking Ahead</h2>
+<ul>
+<li>¥ 100G is maturing.</li>
+<li>¥ 200G available in 2017/2018.</li>
+<li>¥ Terabit links by 2022.</li>
+<li>¥ Software needs to mature. Especially the OS network stack to handle these speeds.</li>
+<li>¥ Issues</li>
+<li>o Memory throughput</li>
+<li>o Proper APIs</li>
+<li>o Deeper integration of cpu/memory/io</li>
+</ul>
+<h2>Q&amp;A</h2>
+<ul>
+<li>¥ Issues</li>
+<li>¥ Getting involved</li>
+<li>¥ How to scale the OS and software</li>
+<li>¥ What impact will this speed have on software</li>
+<li>¥ Contact information</li>
+</ul>
+<a href="mailto:cl@linux.com"><p>cl@linux.com</p></a>
+</div>
+</body>
+</html>
