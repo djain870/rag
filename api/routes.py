@@ -1,7 +1,8 @@
 
 
 from dotenv import load_dotenv
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException, Request
+from src.rate_limiter import check_rate_limit
 
 from api.models import ChatRequest, ChatResponse, IngestResponse
 from src.services.ingest_documents import process_documents
@@ -12,15 +13,33 @@ router = APIRouter()
 load_dotenv()
 
 @router.get("/health")
-def health():
+def health(request: Request):
+    client_id = request.client.host
+
+    if not check_rate_limit(client_id):
+        raise HTTPException(
+            status_code=429,
+            detail="Rate limit exceeded",
+        )
     return {
         "status": "healthy"
     }
 
 @router.post("/chat", response_model=ChatResponse)
-async def chat(request: ChatRequest):
+async def chat(request: Request, chat_request: ChatRequest):
+
+    client_id = request.client.host
+
+    if not check_rate_limit(client_id):
+        raise HTTPException(
+            status_code=429,
+            detail="Rate limit exceeded",
+        )
+
+    response = await get_query_response(chat_request.query)
+
     return ChatResponse(
-        answer= (await get_query_response(request.query))['answer']
+        answer=response["answer"]
     )
 
 @router.get("/ingest", response_model=IngestResponse)

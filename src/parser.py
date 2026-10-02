@@ -8,8 +8,8 @@ from langsmith import traceable
 from pypdf import PdfReader
 from sentence_transformers import SentenceTransformer
 
-from ._1config import DATA_DIR
-from ._9logger import logger
+from .config import DATA_DIR
+from .logger import logger
 
 embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
 print(embedding_model.max_seq_length)

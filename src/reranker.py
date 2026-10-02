@@ -2,8 +2,8 @@ import numpy as np
 import sentence_transformers
 from langsmith import traceable
 
-from src._1config import TOP_K_RERANK
-from src._9logger import logger
+from src.config import TOP_K_RERANK
+from src.logger import logger
 
 # 1. Initialize the Cross-Encoder model
 cross_encoder_model = sentence_transformers.CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")

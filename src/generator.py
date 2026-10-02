@@ -2,8 +2,8 @@ from dotenv import load_dotenv
 from langsmith import traceable
 from openai import AsyncOpenAI
 
-from ._5retriever import search_enterprise_knowledge
-from ._9logger import logger
+from .retriever import search_enterprise_knowledge
+from .logger import logger
 
 load_dotenv()
 client = AsyncOpenAI()

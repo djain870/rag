@@ -1,10 +1,10 @@
 
 from langsmith import traceable
 
-from src._4embedding import embed_query
-from src._6generator import build_context, build_prompt, call_llm
-from src._8reranker import rerank_documents
-from src._9logger import logger
+from src.embedding import embed_query
+from src.generator import build_context, build_prompt, call_llm
+from src.reranker import rerank_documents
+from src.logger import logger
 
 
 @traceable(name="Get Query Response")
