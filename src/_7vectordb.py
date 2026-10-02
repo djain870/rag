@@ -18,7 +18,7 @@ from ._9logger import logger
 
 load_dotenv()
 
-def retrieve_document_hash(source: str) -> str:
+def qdrant_client():
     client = QdrantClient(
         url = os.getenv("QDRANT_CLUSTER_ENDPOINT"),
         api_key = os.getenv("QDRANT_API_KEY"),
@@ -26,6 +26,10 @@ def retrieve_document_hash(source: str) -> str:
         https = True,
         timeout = 30,
     )
+    return client
+
+def retrieve_document_hash(source: str) -> str:
+    client = qdrant_client()
     query_filter = None
     if source:
         query_filter = Filter(
@@ -50,13 +54,7 @@ def retrieve_document_hash(source: str) -> str:
     return response[0][0].payload.get("document_hash")
 
 def delete_document(source: str) -> str:
-    client = QdrantClient(
-        url = os.getenv("QDRANT_CLUSTER_ENDPOINT"),
-        api_key = os.getenv("QDRANT_API_KEY"),
-        port = 443,
-        https = True,
-        timeout = 30,
-    )
+    client = qdrant_client()
     query_filter = None
     if source:
         query_filter = Filter(
@@ -79,13 +77,7 @@ def delete_document(source: str) -> str:
     return response.status
 
 def check_document_exists(source: str) -> bool:
-    client = QdrantClient(
-        url = os.getenv("QDRANT_CLUSTER_ENDPOINT"),
-        api_key = os.getenv("QDRANT_API_KEY"),
-        port = 443,
-        https = True,
-        timeout = 30,
-    )
+    client = qdrant_client()
     query_filter = None
     if source:
         query_filter = Filter(
@@ -113,13 +105,7 @@ def initialize_qdrant_collection():
     Initializes a Qdrant collection for storing embeddings.
     """
     # 1. Initialize the client (Using a local file for persistence)
-    client = QdrantClient(
-        url = os.getenv("QDRANT_CLUSTER_ENDPOINT"),
-        api_key = os.getenv("QDRANT_API_KEY"),
-        port = 443,
-        https = True,
-        timeout = 30,
-    )
+    client = qdrant_client()
 
     # 2. Create a collection (Specify the size of your embeddings and distance metric)
     # 3. if colletion already exists, check below for exception
