@@ -2,8 +2,9 @@ from dotenv import load_dotenv
 from langsmith import traceable
 from openai import AsyncOpenAI
 
-from .retriever import search_enterprise_knowledge
-from .logger import logger
+from src.retriever import search_enterprise_knowledge
+from src.logger import logger
+from src.config import OPENAI_MODEL
 
 load_dotenv()
 client = AsyncOpenAI()
@@ -42,7 +43,7 @@ async def call_llm(prompt: str) -> str:
     """Send a prompt to the LLM."""
     logger.info("Prompt: %s", prompt)
     response = await client.chat.completions.create(
-        model="gpt-4o",
+        model=OPENAI_MODEL,
         messages=[
             {
                 "role": "user",
