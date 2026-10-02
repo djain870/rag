@@ -2,7 +2,6 @@ import json
 
 from src.redis_client import redis_client
 
-
 CACHE_TTL = 3600
 
 

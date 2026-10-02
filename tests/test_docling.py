@@ -1,8 +1,6 @@
-from pathlib import Path
 
 from src.config import DATA_DIR
-from src.parser import parse_and_chunk, get_document_hash
-
+from src.parser import get_document_hash, parse_and_chunk
 
 docs_path = [f for f in DATA_DIR.glob("**/*.*") if f.suffix in [".pdf", ".pptx", ".docx", ".html", ".txt"]]
 file_path = docs_path[0]

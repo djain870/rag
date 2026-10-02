@@ -2,9 +2,9 @@ from dotenv import load_dotenv
 from langsmith import traceable
 from openai import AsyncOpenAI
 
-from src.retriever import search_enterprise_knowledge
-from src.logger import logger
 from src.config import OPENAI_MODEL
+from src.logger import logger
+from src.retriever import search_enterprise_knowledge
 
 load_dotenv()
 client = AsyncOpenAI()
