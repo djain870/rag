@@ -6,6 +6,7 @@ from qdrant_client import QdrantClient
 from qdrant_client.models import FieldCondition, Filter, MatchValue
 
 from ._1config import QDRANT_COLLECTION, SCORE_THRESHOLD, TOP_K
+from ._7vectordb import qdrant_client
 from ._9logger import logger
 
 
@@ -13,13 +14,7 @@ from ._9logger import logger
 def search_enterprise_knowledge(query_vector: str, source = None):
 
     # Using query_points - the modern standard for Qdrant
-    client = QdrantClient(
-        url = os.getenv("QDRANT_CLUSTER_ENDPOINT"),
-        api_key = os.getenv("QDRANT_API_KEY"),
-        port = 443,
-        https = True,
-        timeout = 30,
-    )
+    client = qdrant_client()
 
     query_filter = None
     if source:
