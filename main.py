@@ -2,8 +2,8 @@ import asyncio
 
 from langsmith import traceable
 
-from src._7vectordb import initialize_qdrant_collection
-from src._9logger import logger
+from src.vectordb import initialize_qdrant_collection
+from src.logger import logger
 from src.services.ingest_documents import process_documents
 from src.services.rag_service import get_query_response
 

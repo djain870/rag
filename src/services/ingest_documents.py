@@ -1,18 +1,18 @@
 from langsmith import traceable
 
-from src._1config import CHUNK_OVERLAP, CHUNK_SIZE, DATA_DIR
-from src._2parser import (
+from src.config import CHUNK_OVERLAP, CHUNK_SIZE, DATA_DIR
+from src.parser import (
     get_document_hash,
     parse_and_chunk,
 )
-from src._3chunker_unused import chunk_text
-from src._4embedding import embed_chunks
-from src._7vectordb import (
+from src.chunker_unused import chunk_text
+from src.embedding import embed_chunks
+from src.vectordb import (
     delete_document,
     retrieve_document_hash,
     upsert_embeddings_to_qdrant,
 )
-from src._9logger import logger
+from src.logger import logger
 
 
 def prepare_chunks(cleaned_pages, pdf_path, doc_hash):

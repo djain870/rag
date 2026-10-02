@@ -13,8 +13,8 @@ from qdrant_client.models import (
     VectorParams,
 )
 
-from ._1config import QDRANT_COLLECTION
-from ._9logger import logger
+from .config import QDRANT_COLLECTION
+from .logger import logger
 
 load_dotenv()
 
