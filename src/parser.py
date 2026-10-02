@@ -12,14 +12,14 @@ from .config import DATA_DIR
 from .logger import logger
 
 embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
-print(embedding_model.max_seq_length)
+# print(embedding_model.max_seq_length)
 converter = DocumentConverter()
 chunker = HybridChunker(
     tokenizer = embedding_model.tokenizer,
     max_tokens = 200,
 )
-print(chunker)
-print("Chunker max tokens:", chunker.max_tokens)
+# print(chunker)
+# print("Chunker max tokens:", chunker.max_tokens)
 # def get_document_hash(pdf_path: Path) -> str:
 #     """Return a hash of the PDF contents."""
 #     sha256 = hashlib.sha256()

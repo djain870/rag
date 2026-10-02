@@ -2,9 +2,12 @@
 
 from dotenv import load_dotenv
 from fastapi import APIRouter, HTTPException, Request
-from src.rate_limiter import check_rate_limit
 
 from api.models import ChatRequest, ChatResponse, IngestResponse
+from src.cache import get_cached_response, save_cached_response
+from src.conversation_memory import get_conversation_history, save_conversation_history
+from src.query_rephraser import rewrite_query
+from src.rate_limiter import check_rate_limit
 from src.services.ingest_documents import process_documents
 from src.services.rag_service import get_query_response
 
@@ -30,29 +33,58 @@ async def chat(request: Request, chat_request: ChatRequest):
 
     client_id = request.client.host
 
+    # Check rate limit for the client
     if not check_rate_limit(client_id):
         raise HTTPException(
             status_code=429,
             detail="Rate limit exceeded",
         )
 
-    response = await get_query_response(chat_request.query)
+    # Load conversation history
+    history = get_conversation_history(chat_request.conversation_id)
+
+    # Rewrite the query based on conversation history
+    rephrased_query = rewrite_query(chat_request.query, history)
+
+    cached_response = get_cached_response(
+        chat_request.conversation_id,
+        rephrased_query
+    )
+
+    if cached_response:
+        return ChatResponse(
+            answer=cached_response["answer"]
+        )
+
+    response = await get_query_response(rephrased_query)
+    answer = response["answer"]
+
+    # Save the conversation history
+    history.append({
+        "role": "user",
+        "content": chat_request.query,
+    })
+
+    history.append({
+        "role": "assistant",
+        "content": answer,
+    })
+
+    save_conversation_history(
+        chat_request.conversation_id,
+        history,
+    )
+
+    save_cached_response(
+        chat_request.conversation_id,
+        rephrased_query,
+        response,
+    )
 
     return ChatResponse(
-        answer=response["answer"]
+        answer=answer
     )
 
 @router.get("/ingest", response_model=IngestResponse)
 def ingest():
     return process_documents()
-
-
-
-# @router.get("/sleep")
-# async def sleep():
-#     # print("started")
-#     logger.info("Started at %s", datetime.now().strftime("%H:%M:%S"))
-#     await asyncio.sleep(5)
-#     # print("Finished")
-#     logger.info("Finished at %s", datetime.now().strftime("%H:%M:%S"))
-#     return {"message": "Done"}
