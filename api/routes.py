@@ -52,12 +52,30 @@ async def chat(request: Request, chat_request: ChatRequest):
     )
 
     if cached_response:
+        sources = [
+            {
+                "source": doc.get("source"),
+                "page": doc.get("page"),
+                "score": doc.get("score"),
+            }
+            for doc in cached_response["vector_results"]
+        ]
         return ChatResponse(
-            answer=cached_response["answer"]
+            answer=cached_response["answer"],
+            sources=sources,
         )
 
     response = await get_query_response(rephrased_query)
     answer = response["answer"]
+
+    sources = [
+        {
+            "source": doc.get("source"),
+            "page": doc.get("page"),
+            "score": doc.get("score"),
+        }
+        for doc in response["vector_results"]
+    ]
 
     # Save the conversation history
     history.append({
@@ -82,7 +100,8 @@ async def chat(request: Request, chat_request: ChatRequest):
     )
 
     return ChatResponse(
-        answer=answer
+        answer=answer,
+        sources=sources,
     )
 
 @router.get("/ingest", response_model=IngestResponse)

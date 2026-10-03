@@ -5,3 +5,5 @@ myenv/
 learn_python.ipynb
 DATA/
 qdrant_storage/
+# Streamlit agent skills (environment-specific symlinks)
+.agents/skills/developing-with-streamlit

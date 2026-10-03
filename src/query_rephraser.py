@@ -1,7 +1,10 @@
 from openai import OpenAI
+from dotenv import load_dotenv
 
 from .config import OPENAI_MODEL
 
+
+load_dotenv()
 client = OpenAI()
 
 
