@@ -5,8 +5,15 @@ class ChatRequest(BaseModel):
     query: str
     conversation_id: str
 
+class Source(BaseModel):
+    source: str | None = None
+    page: int | None = None
+    score: float | None = None
+
 class ChatResponse(BaseModel):
     answer: str
+    sources: list[Source] = []
+
 
 class IngestResponse(BaseModel):
     new_pdfs: int
