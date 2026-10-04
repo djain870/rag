@@ -2,13 +2,14 @@
 from langsmith import traceable
 
 from src.embedding import embed_query
-from src.generator import build_context, build_prompt, call_llm
+from src.generator import build_context, build_prompt, generate_response
 from src.logger import logger
 from src.reranker import rerank_documents
 
 
 @traceable(name="Get Query Response")
 async def get_query_response(query):
+    logger.info("Function called: get_query_response")
     query_embedding = embed_query(query)
     logger.info("Query embedding generated")
     results = build_context(query_embedding)
@@ -16,8 +17,8 @@ async def get_query_response(query):
     documents = [doc["text"] for doc in results]
     reranked_docs = rerank_documents(query, documents, top_k=3)
     prompt = build_prompt(query, reranked_docs)
-    response = await call_llm(prompt)
-    print(response)
+    response = await generate_response(prompt)
+    # logger.info("LLM response generated: %s", results)
     return {
         "answer": response,
         "vector_results": results,

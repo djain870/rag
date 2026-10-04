@@ -1,4 +1,12 @@
+import logging
+
 import numpy as np
+
+logging.getLogger("httpx").setLevel(logging.WARNING)
+logging.getLogger("httpcore").setLevel(logging.WARNING)
+logging.getLogger("huggingface_hub").setLevel(logging.WARNING)
+logging.getLogger("sentence_transformers").setLevel(logging.WARNING)
+
 import sentence_transformers
 from langsmith import traceable
 
@@ -6,7 +14,16 @@ from src.config import TOP_K_RERANK
 from src.logger import logger
 
 # 1. Initialize the Cross-Encoder model
-cross_encoder_model = sentence_transformers.CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
+cross_encoder_model = None
+
+def load_cross_encoder_model():
+    """
+    Returns the initialized Cross-Encoder model.
+    """
+    global cross_encoder_model
+    if cross_encoder_model is None:
+        cross_encoder_model = sentence_transformers.CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
+    return cross_encoder_model
 
 @traceable(name="Cross Encoder Reranker")
 def rerank_documents(query: str, documents: list[str], top_k: int = 3):
@@ -14,13 +31,14 @@ def rerank_documents(query: str, documents: list[str], top_k: int = 3):
     Reranks documents based on their semantic relevance to a query 
     using a Hugging Face CrossEncoder model.
     """
+    logger.info("Function called: rerank_documents")
     # 1. Initialize the Cross-Encoder model
     # model = sentence_transformers.CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
     
     # 2. Pair the query with each document as required by Cross-Encoders
     # The required format is a list of tuples: [(query, doc1), (query, doc2), ...]
     pairs = [(query, doc) for doc in documents]
-    
+    cross_encoder_model = load_cross_encoder_model()
     # 3. Predict similarity scores
     scores = cross_encoder_model.predict(pairs)
 
@@ -38,7 +56,7 @@ def rerank_documents(query: str, documents: list[str], top_k: int = 3):
             "score": float(scores[idx]),
             "document": documents[idx]
         })
-    logger.info("Ranked results: %s", ranked_results)
+    # logger.info("Ranked results: %s", ranked_results)
     # print(ranked_results)
     # print(type(ranked_results))
     #return top k reranked results only

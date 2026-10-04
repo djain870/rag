@@ -13,6 +13,7 @@ class Source(BaseModel):
 class ChatResponse(BaseModel):
     answer: str
     sources: list[Source] = []
+    tools_used: list[str] = []
 
 
 class IngestResponse(BaseModel):

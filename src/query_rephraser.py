@@ -1,8 +1,8 @@
-from openai import OpenAI
 from dotenv import load_dotenv
+from openai import OpenAI
 
-from .config import OPENAI_MODEL
-
+from src.config import OPENAI_MODEL
+from src.logger import logger
 
 load_dotenv()
 client = OpenAI()
@@ -12,7 +12,7 @@ def rewrite_query(
     query: str,
     history: list,
 ) -> str:
-
+    logger.info("Function called: rewrite query")
     if not history:
         return query
 

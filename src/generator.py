@@ -1,16 +1,13 @@
-from dotenv import load_dotenv
 from langsmith import traceable
-from openai import AsyncOpenAI
 
-from src.config import OPENAI_MODEL
 from src.logger import logger
 from src.retriever import search_enterprise_knowledge
+from src.services.call_llm import call_llm
 
-load_dotenv()
-client = AsyncOpenAI()
 
 def build_context(query_embedding: list[float]) -> str:
     """Build the context for the LLM based on the query."""
+    logger.info("Function called: build context")
     # This function would typically search your vector database or knowledge base
     # to find relevant information based on the query.
     # For demonstration purposes, we'll return a placeholder context.
@@ -20,7 +17,7 @@ def build_context(query_embedding: list[float]) -> str:
 
 def build_prompt(query: str, reranked_docs: list[dict]) -> str:
     """Build the prompt sent to the LLM."""
-
+    logger.info("Function called: build prompt")
     context = "  ".join([reranked_doc['document'] for reranked_doc in reranked_docs])
     logger.info("Context: %s", context)
     # print(context)
@@ -38,21 +35,19 @@ Question:
 {query}
 """
 
-@traceable(name="LLM Call")
-async def call_llm(prompt: str) -> str:
+@traceable(name="Generate Response")
+async def generate_response(prompt: str) -> str:
     """Send a prompt to the LLM."""
-    logger.info("Prompt: %s", prompt)
-    response = await client.chat.completions.create(
-        model=OPENAI_MODEL,
-        messages=[
+    # logger.info("Prompt: %s", prompt)
+    logger.info("Function called: generate response")
+    response = await call_llm(
+        message=[
             {
                 "role": "user",
                 "content": prompt
             }
         ],
-        temperature=0
     )
-
     return response.choices[0].message.content
 
 if __name__ == "__main__":

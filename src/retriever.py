@@ -10,6 +10,7 @@ from .vectordb import qdrant_client
 
 @traceable(name="Vector Search")
 def search_enterprise_knowledge(query_vector: str, source = None):
+    logger.info("Function called: search_enterprise_knowledge")
 
     # Using query_points - the modern standard for Qdrant
     client = qdrant_client()
