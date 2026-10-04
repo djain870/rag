@@ -1,11 +1,16 @@
+from langsmith import traceable
 from mcp.server.mcpserver import MCPServer
 
+from src.embedding import load_embedding_model
 from src.logger import logger
+from src.reranker import load_cross_encoder_model
 from src.services.rag_service import get_query_response
 
 mcp = MCPServer("RAG Server")
+embedding_model = load_embedding_model()
+cross_encoder_model = load_cross_encoder_model()
 
-
+@traceable(name="Search Knowledge")
 @mcp.tool()
 async def search_knowledge(query: str) -> dict:
     """

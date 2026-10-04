@@ -16,10 +16,12 @@ from src.logger import logger
 # 1. Initialize the Cross-Encoder model
 cross_encoder_model = None
 
+@traceable(name="Load Cross Encoder Model")
 def load_cross_encoder_model():
     """
     Returns the initialized Cross-Encoder model.
     """
+    logger.info("Function called: load_cross_encoder_model")
     global cross_encoder_model
     if cross_encoder_model is None:
         cross_encoder_model = sentence_transformers.CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
