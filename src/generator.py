@@ -5,6 +5,7 @@ from src.retriever import search_enterprise_knowledge
 from src.services.call_llm import call_llm
 
 
+@traceable(name="Build Context")
 def build_context(query_embedding: list[float]) -> str:
     """Build the context for the LLM based on the query."""
     logger.info("Function called: build context")
@@ -15,6 +16,7 @@ def build_context(query_embedding: list[float]) -> str:
     # context = "  ".join([results[i]['text'] for i in range(len(results))])
     return results
 
+@traceable(name="Build Prompt")
 def build_prompt(query: str, reranked_docs: list[dict]) -> str:
     """Build the prompt sent to the LLM."""
     logger.info("Function called: build prompt")

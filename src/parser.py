@@ -6,27 +6,19 @@ from docling.chunking import HybridChunker
 from docling.document_converter import DocumentConverter
 from langsmith import traceable
 from pypdf import PdfReader
-from sentence_transformers import SentenceTransformer
+
+from src.embedding import load_embedding_model
 
 from .config import DATA_DIR
 from .logger import logger
 
-embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
-# print(embedding_model.max_seq_length)
-converter = DocumentConverter()
-chunker = HybridChunker(
-    tokenizer = embedding_model.tokenizer,
-    max_tokens = 200,
-)
-# print(chunker)
-# print("Chunker max tokens:", chunker.max_tokens)
-# def get_document_hash(pdf_path: Path) -> str:
-#     """Return a hash of the PDF contents."""
-#     sha256 = hashlib.sha256()
-#     with open(pdf_path, "rb") as f:
-#         while chunk := f.read(8192):
-#             sha256.update(chunk)
-#     return sha256.hexdigest()
+
+def load_chunker():
+    embedding_model = load_embedding_model()
+    return HybridChunker(
+        tokenizer = embedding_model.tokenizer,
+        max_tokens = 200,
+    )
 
 def get_document_hash(doc_path: Path) -> str:
     """Return a hash of the PDF contents."""
@@ -80,10 +72,11 @@ def parse_document(file_path: Path) -> str:
     return result.document
 
 
-
 def parse_and_chunk(file_path: Path, document_hash: str):
+    converter = DocumentConverter()
     result = converter.convert(file_path)
 
+    chunker = load_chunker()
     chunks = list(chunker.chunk(result.document))
 
     return [
