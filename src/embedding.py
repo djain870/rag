@@ -1,5 +1,7 @@
 import logging
 
+from src.logger import logger
+
 logging.getLogger("httpx").setLevel(logging.WARNING)
 logging.getLogger("httpcore").setLevel(logging.WARNING)
 logging.getLogger("huggingface_hub").setLevel(logging.WARNING)
@@ -11,6 +13,7 @@ embedding_model = None
 
 def load_embedding_model():
     """Load the embedding model."""
+    logger.info("Function called: load embedding model")
     global embedding_model
     if embedding_model is None:
         embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
@@ -25,5 +28,6 @@ def embed_chunks(chunks: list[str])-> list[list[float]]:
 
 def embed_query(query: str):
     """Generate embedding for a query using the embedding model."""
-    load_embedding_model()
+    logger.info("Function called: embed query")
+    embedding_model = load_embedding_model()
     return embedding_model.encode([query])[0]

@@ -1,11 +1,13 @@
 import json
 
+from src.logger import logger
 from src.redis_client import redis_client
 
 MEMORY_TTL = 3600
 
 
 def get_conversation_history(conversation_id: str) -> list:
+    logger.info("Function called: get conversation history")
     key = f"conversation:{conversation_id}"
 
     history = redis_client.get(key)
@@ -20,6 +22,7 @@ def save_conversation_history(
     conversation_id: str,
     history: list,
 ) -> None:
+    logger.info("Function called: save conversation history")
     key = f"conversation:{conversation_id}"
 
     redis_client.set(

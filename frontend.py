@@ -3,7 +3,6 @@ import uuid
 import requests
 import streamlit as st
 
-
 API_URL = "http://127.0.0.1:8000"
 
 
@@ -60,54 +59,57 @@ if query:
 
 
     # Call FastAPI
-    with st.chat_message("assistant"):
+    with st.chat_message("assistant"), st.spinner("Thinking..."):
 
-        with st.spinner("Thinking..."):
+        try:
 
-            try:
+            response = requests.post(
+                f"{API_URL}/chat",
+                json={
+                    "conversation_id":
+                        st.session_state.conversation_id,
+                    "query": query,
+                },
+                timeout=120,
+            )
 
-                response = requests.post(
-                    f"{API_URL}/chat",
-                    json={
-                        "conversation_id":
-                            st.session_state.conversation_id,
-                        "query": query,
-                    },
-                    timeout=120,
-                )
+            response.raise_for_status()
 
-                response.raise_for_status()
+            data = response.json()
 
-                data = response.json()
+            answer = data["answer"]
+            sources = data.get("sources", [])
+            tools_used = data.get("tools_used", [])
 
-                answer = data["answer"]
-                sources = data.get("sources", [])
+            if tools_used:
+                st.markdown("### Tools Used")
+                st.write(", ".join(tools_used))
 
-                if sources:
-                    st.markdown("### Sources")
-                    for source in sources:
-                        document = source.get("source")
-                        page = source.get("page")
-                        score = source.get("score")
-                        if page is not None:
-                            st.write(
-                                f"{document} — Page {page}"
-                            )
-                        else:
-                            st.write(
-                                f"{document}"
-                            )
+            if sources:
+                st.markdown("### Sources")
+                for source in sources:
+                    document = source.get("source")
+                    page = source.get("page")
+                    score = source.get("score")
+                    if page is not None:
+                        st.write(
+                            f"{document} — Page {page}"
+                        )
+                    else:
+                        st.write(
+                            f"{document}"
+                        )
 
-                st.write(answer)
+            st.write(answer)
 
-                st.session_state.messages.append({
-                    "role": "assistant",
-                    "content": answer,
-                })
+            st.session_state.messages.append({
+                "role": "assistant",
+                "content": answer,
+            })
 
 
-            except requests.RequestException as e:
+        except requests.RequestException as e:
 
-                st.error(
-                    f"Could not connect to the RAG API: {e}"
-                )
+            st.error(
+                f"Could not connect to the RAG API: {e}"
+            )

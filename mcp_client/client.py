@@ -1,142 +1,100 @@
-import asyncio
 import json
 
-from mcp import Client, StdioServerParameters
-from openai import OpenAI
-from src.services.call_llm import call_llm
+from dotenv import load_dotenv
+from langchain.agents import create_agent
+from langchain.mcp import MCPAdapter
+from langchain_openai import ChatOpenAI
 
+from src.config import OPENAI_MODEL
+from src.logger import logger
 
-client = OpenAI()
+load_dotenv()
 
-server_params = StdioServerParameters(
-    command="python",
-    args=["-m", "mcp_server.server"],
+model = ChatOpenAI(
+    model=OPENAI_MODEL,
+    temperature=0,
 )
 
 
-def convert_mcp_tools_to_openai(mcp_tools):
-    """Convert MCP tool definitions to OpenAI tool definitions."""
-
-    tools = []
-
-    for tool in mcp_tools:
-
-        tools.append({
-            "type": "function",
-            "function": {
-                "name": tool.name,
-                "description": tool.description or "",
-                "parameters": tool.input_schema,
-            },
-        })
-
-    return tools
-
-
 async def run_agent(user_query: str):
+    logger.info("Function called: run agent")
+    async with MCPAdapter(
+        {
+            "mcpServers": {
+                "rag": {
+                    "command": "python",
+                    "args": ["-m", "mcp_server.server"],
+                    "transport": "stdio",
+                }
+            }
+        }
+    ) as adapter:
 
-    async with Client(server_params) as mcp_client:
-
-        # 1. Discover MCP tools
-        tool_result = await mcp_client.list_tools()
-
-        tools = convert_mcp_tools_to_openai(
-            tool_result.tools
-        )
+        tools = await adapter.list_tools()
 
         print("Available tools:")
 
         for tool in tools:
-            print(
-                f"- {tool['function']['name']}"
-            )
+            print(f"- {tool.name}")
 
-        # 2. Send question + tools to LLM
-        messages = [
+        agent = create_agent(
+            model,
+            tools,
+        )
+
+        result = await agent.ainvoke(
             {
-                "role": "system",
-                "content": (
-                    "You are an AI assistant. "
-                    "Use available tools when they "
-                    "are useful for answering the user."
-                ),
-            },
-            {
-                "role": "user",
-                "content": user_query,
-            },
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": user_query,
+                    }
+                ]
+            }
+        )
+        tools_used = [
+            tool_call["name"]
+            for message in result["messages"]
+            for tool_call in getattr(message, "tool_calls", [])
         ]
 
-        response = await call_llm(
-            message=messages,
-            tools=tools,
-            tool_choice="auto",
-        )
+        logger.info("Tools used: %s", tools_used)
+        messages = result["messages"]
 
+        answer = messages[-1].content
 
+        sources = []
+        # logger.info("Messages: %s", messages)
 
-        assistant_message = response.choices[0].message
+        for message in messages:
+            if (
+                getattr(message, "type", None) == "tool"
+                and isinstance(message.content, list)
+            ):
+                for content in message.content:
+                    if (
+                        isinstance(content, dict)
+                        and content.get("type") == "text"
+                    ):
+                        tool_result = json.loads(content["text"])
 
-        # 3. No tool required
-        if not assistant_message.tool_calls:
+                        sources.extend(
+                            tool_result.get("sources", [])
+                        )
 
-            return assistant_message.content
-
-        # 4. Add assistant tool-call message
-        messages.append(
-            assistant_message
-        )
-
-        # 5. Execute requested tools
-        for tool_call in assistant_message.tool_calls:
-
-            tool_name = tool_call.function.name
-
-            arguments = json.loads(
-                tool_call.function.arguments
-            )
-
-            print(
-                f"\nAgent calling tool: {tool_name}"
-            )
-
-            print(
-                f"Arguments: {arguments}"
-            )
-
-            # 6. Call MCP tool
-            result = await mcp_client.call_tool(
-                tool_name,
-                arguments,
-            )
-
-            # Extract text from MCP result
-            tool_output = "\n".join(
-                item.text
-                for item in result.content
-                if hasattr(item, "text")
-            )
-
-            # 7. Give tool result back to LLM
-            messages.append({
-                "role": "tool",
-                "tool_call_id": tool_call.id,
-                "content": tool_output,
-            })
-
-        # 8. Ask LLM for final answer
-        final_response = await call_llm(
-            message=messages,
-        )
-
-        return final_response.choices[0].message.content
+        return {
+            "answer": answer,
+            "sources": sources,
+            "tools_used": tools_used,
+        }
 
 
 if __name__ == "__main__":
+    import asyncio
 
     answer = asyncio.run(
         run_agent(
-            "What is Kubernetes?"
+            "What is Kubernetes and what is 125 × 48?"
         )
     )
 

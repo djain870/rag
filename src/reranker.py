@@ -1,5 +1,6 @@
-import numpy as np
 import logging
+
+import numpy as np
 
 logging.getLogger("httpx").setLevel(logging.WARNING)
 logging.getLogger("httpcore").setLevel(logging.WARNING)
@@ -30,6 +31,7 @@ def rerank_documents(query: str, documents: list[str], top_k: int = 3):
     Reranks documents based on their semantic relevance to a query 
     using a Hugging Face CrossEncoder model.
     """
+    logger.info("Function called: rerank_documents")
     # 1. Initialize the Cross-Encoder model
     # model = sentence_transformers.CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
     

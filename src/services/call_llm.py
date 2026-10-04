@@ -9,7 +9,7 @@ load_dotenv()
 client = AsyncOpenAI()
 
 @traceable(name="LLM Call")
-async def call_llm(message: list, tools: str = None, tool_choice: str = None) -> list:
+async def call_llm(message: list, tools: list | None = None, tool_choice: list | None = None) -> list:
     """Send message to the LLM."""
     response = await client.chat.completions.create(
         model=OPENAI_MODEL,
