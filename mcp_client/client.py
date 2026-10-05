@@ -115,7 +115,11 @@ async def run_agent(user_query: str):
                     isinstance(content, dict)
                     and content.get("type") == "text"
                 ):
-                    tool_result = json.loads(content["text"])
+                    try:
+                        tool_result = json.loads(content["text"])
+                    except json.JSONDecodeError:
+                        continue
+
                     if isinstance(tool_result, dict):
                         sources.extend(
                             tool_result.get("sources", [])
