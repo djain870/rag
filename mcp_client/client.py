@@ -108,10 +108,10 @@ async def run_agent(user_query: str):
                     and content.get("type") == "text"
                 ):
                     tool_result = json.loads(content["text"])
-
-                    sources.extend(
-                        tool_result.get("sources", [])
-                    )
+                    if isinstance(tool_result, dict):
+                        sources.extend(
+                            tool_result.get("sources", [])
+                        )
 
     return {
         "answer": answer,

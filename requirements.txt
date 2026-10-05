@@ -8,3 +8,13 @@ python-dotenv
 qdrant-client
 sentence-transformers
 uvicorn[standard]
+langchain
+requests
+streamlit
+langchain-openai
+docling
+redis
+mcp
+ipython
+beir
+pandas
