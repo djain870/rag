@@ -8,11 +8,8 @@ from mcp_client.client import start_mcp, stop_mcp
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-
     await start_mcp()
-
     yield
-
     await stop_mcp()
 
 app = FastAPI(
