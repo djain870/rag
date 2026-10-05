@@ -11,10 +11,18 @@ from src.logger import logger
 
 load_dotenv()
 
-model = ChatOpenAI(
-    model=OPENAI_MODEL,
-    temperature=0,
-)
+model = None
+
+def get_model():
+    global model
+
+    if model is None:
+        model = ChatOpenAI(
+            model=OPENAI_MODEL,
+            temperature=0,
+        )
+
+    return model
 
 mcp_tools = None
 
@@ -51,7 +59,7 @@ async def list_mcp_tools(adapter):
 @traceable(name="Create Agent")
 def create_rag_agent(model, tools):
     return create_agent(
-        model,
+        get_model(),
         tools,
     )
 
