@@ -1,4 +1,4 @@
-fastapi
+fastapi==0.141.1
 langsmith
 numpy
 openai
@@ -9,12 +9,12 @@ qdrant-client
 sentence-transformers
 uvicorn[standard]
 langchain[mcp]==1.4.3
+langchain-openai==1.6.2
 requests
 streamlit
 langchain-openai
 docling
 redis
-mcp
 ipython
 beir
 pandas
