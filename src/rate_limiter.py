@@ -1,6 +1,6 @@
 from src.logger import logger
 
-from .redis_client import redis_client
+from .redis_client import redis_client, USE_REDIS
 
 RATE_LIMIT = 10
 WINDOW_SECONDS = 60
@@ -8,6 +8,9 @@ WINDOW_SECONDS = 60
 
 def check_rate_limit(client_id: str) -> bool:
     logger.info("Function called: check rate limit")
+
+    if not USE_REDIS:
+        return True
 
     key = f"rate_limit:{client_id}"
 

@@ -1,7 +1,7 @@
 import json
 
 from src.logger import logger
-from src.redis_client import redis_client
+from src.redis_client import USE_REDIS, redis_client
 
 CACHE_TTL = 3600
 
@@ -11,6 +11,10 @@ def get_cached_response(
     query: str,
 ):
     logger.info("Function called: get cached response")
+
+    if not USE_REDIS:
+        return None
+
     key = f"cache:{conversation_id}:{query}"
 
     cached = redis_client.get(key)
@@ -27,6 +31,10 @@ def save_cached_response(
     response: dict,
 ) -> None:
     logger.info("Function called: save cached response")
+
+    if not USE_REDIS:
+        return
+
     key = f"cache:{conversation_id}:{query}"
 
     redis_client.set(

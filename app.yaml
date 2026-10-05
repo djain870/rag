@@ -3,6 +3,9 @@ command:
   - start.sh
 
 env:
+  - name: USE_REDIS
+    value: "false"
+
   - name: OPENAI_API_KEY
     valueFrom: OPENAI_API_KEY
 
